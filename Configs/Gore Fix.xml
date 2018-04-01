@@ -1,0 +1,8 @@
+<configs>
+	<config name="blocks">
+		<set xpath="/blocks/block[@id='701']/property[@name='Class']/@value">GoreFixed, Mods</set>
+	</config>
+	<config name="entityclasses">
+		<set xpath="/entity_classes/entity_class[@name='zombieTemplateMale']/property[@name='Class']/@value">EntityZombieCorpseDropFix, Mods</set>
+	</config>
+</configs>

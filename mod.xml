@@ -1,0 +1,14 @@
+<mod>
+	<info>
+		<author>Ghost314</author>
+		<name>Corpse Disintegration Fix</name>
+		<description>When dead zombies transform into corpses, they will be placed in an area that does not contain another corpse. This prevents the corpses from disintegrating, along with their loot.</description>
+		<mod_version>0.1</mod_version>
+		<game_version>16.4</game_version>
+		<launcher_version>0.7.1</launcher_version>
+		<type>QoL</type>
+	</info>
+	<config_mods>
+		<import file="Configs\Gore Fix.xml" />
+	</config_mods>
+</mod>
