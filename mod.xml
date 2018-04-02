@@ -9,6 +9,6 @@
 		<type>QoL</type>
 	</info>
 	<config_mods>
-		<import file="Configs\Gore Fix.xml" />
+		<import file="Configs\EntityClasses.xml" />
 	</config_mods>
 </mod>
