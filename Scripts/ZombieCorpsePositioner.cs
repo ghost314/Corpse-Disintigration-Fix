@@ -44,7 +44,7 @@
 
         return origin;
     }
-    
+
     private Vector3i CheckTopRow(Vector3i nextPositionToCheck, Vector3i origin, int distanceFromOrigin)
     {
         nextPositionToCheck.z = origin.z + distanceFromOrigin;
@@ -93,7 +93,7 @@
         {
             nextPositionToCheck.z = origin.z + zOffset;
             Vector3i potentialSpawnPoint = FindValidSpawnPointAt(nextPositionToCheck);
-            if (potentialSpawnPoint!=Vector3i.zero)
+            if (potentialSpawnPoint != Vector3i.zero)
                 return potentialSpawnPoint;
         }
         return Vector3i.zero;
@@ -134,7 +134,7 @@
             location.y = airBlock;
         }
         int groundPosition = FindGroundBelow(location);
-        if(groundPosition < MIN_HEIGHT)
+        if (groundPosition < MIN_HEIGHT)
         {
             return -1;
         }
@@ -153,7 +153,7 @@
     private int FindEmptySpaceAbove(Vector3i location)
     {
         location.y++;
-        for(; location.y < MAX_HEIGHT; location.y++)
+        for (; location.y < MAX_HEIGHT; location.y++)
         {
             if (!getBlock(location).IsCollideMovement)
                 return location.y;
@@ -171,7 +171,7 @@
         }
         return -1;
     }
-    
+
     private int FindGroundBelow(Vector3i location)
     {
         location.y--;

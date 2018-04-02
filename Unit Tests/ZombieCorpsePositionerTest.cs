@@ -1,10 +1,5 @@
 ﻿using NUnit.Framework;
-using UnityEngine;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 [TestFixture]
 public class ZombieCorpsePositionerTest
@@ -19,7 +14,7 @@ public class ZombieCorpsePositionerTest
     public void SetUp()
     {
         positioner = new ZombieCorpsePositioner(Console.WriteLine, GetBlockAt);
-        
+
         for (int x = 0; x < WORLD_LENGTH; x++)
         {
             for (int y = 0; y < WORLD_HEIGHT; y++)
@@ -41,26 +36,29 @@ public class ZombieCorpsePositionerTest
     public void WhenCurrentPositionIsAlreadyEmptyThenCorpseIsSpawnedAtCurrentPosition()
     {
         int height = GROUND_HEIGHT + 1;
+        Vector3i startingPosition = new Vector3i(50, height, 50);
 
-        Vector3i position = positioner.FindSpawnLocationStartingFrom(new Vector3i(50, height, 50));
+        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition);
 
-        Assert.AreEqual(new Vector3i(50, height, 50), position);
+        Assert.AreEqual(new Vector3i(startingPosition.x, height, startingPosition.z), position);
     }
 
     [Test]
     public void WhenCurrentPositionIsBelowGroundThenCorpseIsSpawnedAboveGround()
     {
-        Vector3i position = positioner.FindSpawnLocationStartingFrom(new Vector3i(50, 25, 50));
+        Vector3i startingPosition = new Vector3i(50, 25, 50);
+        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition);
 
-        Assert.AreEqual(new Vector3i(50, GROUND_HEIGHT + 1, 50), position);
+        Assert.AreEqual(new Vector3i(startingPosition.x, GROUND_HEIGHT + 1, startingPosition.z), position);
     }
 
     [Test]
     public void WhenCurrentPositionIsMidAirThenCorpseIsSpawnedAtGround()
     {
-        Vector3i position = positioner.FindSpawnLocationStartingFrom(new Vector3i(50, GROUND_HEIGHT + 50, 50));
+        Vector3i startingPosition = new Vector3i(50, GROUND_HEIGHT + 50, 50);
+        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition);
 
-        Assert.AreEqual(new Vector3i(50, GROUND_HEIGHT + 1, 50), position);
+        Assert.AreEqual(new Vector3i(startingPosition.x, GROUND_HEIGHT + 1, startingPosition.z), position);
     }
 
     [Test]
@@ -73,8 +71,8 @@ public class ZombieCorpsePositionerTest
 
         Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition);
 
-        int deltaX = Math.Abs(position.x - 50);
-        int deltaZ = Math.Abs(position.x - 50);
+        int deltaX = Math.Abs(position.x - startingPosition.x);
+        int deltaZ = Math.Abs(position.z - startingPosition.z);
         Assert.LessOrEqual(deltaX, 1);
         Assert.LessOrEqual(deltaZ, 1);
         Assert.Greater(deltaX + deltaZ, 0);
@@ -91,8 +89,8 @@ public class ZombieCorpsePositionerTest
 
         Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition);
 
-        int deltaX = Math.Abs(position.x - 50);
-        int deltaZ = Math.Abs(position.x - 50);
+        int deltaX = Math.Abs(position.x - startingPosition.x);
+        int deltaZ = Math.Abs(position.z - startingPosition.z);
         Assert.LessOrEqual(deltaX, 1);
         Assert.LessOrEqual(deltaZ, 1);
         Assert.Greater(deltaX + deltaZ, 0);
@@ -106,18 +104,18 @@ public class ZombieCorpsePositionerTest
 
         Vector3i startingPosition = new Vector3i(50, height, 50);
         SetBlockAt(startingPosition, GenerateGoreBlock());
-        SetBlockAt(new Vector3i(startingPosition.x,startingPosition.y-1,startingPosition.z), GenerateOccupiedBlock());
+        SetBlockAt(new Vector3i(startingPosition.x, startingPosition.y - 1, startingPosition.z), GenerateOccupiedBlock());
 
         Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition);
 
-        int deltaX = Math.Abs(position.x - 50);
-        int deltaZ = Math.Abs(position.x - 50);
+        int deltaX = Math.Abs(position.x - startingPosition.x);
+        int deltaZ = Math.Abs(position.z - startingPosition.z);
         Assert.LessOrEqual(deltaX, 1);
         Assert.LessOrEqual(deltaZ, 1);
         Assert.Greater(deltaX + deltaZ, 0);
         Assert.AreEqual(height - 1, position.y);
     }
-    
+
     [Test]
     public void WhenCurrentPositionIsInBetweenTwoFloorsThenCorpseIsSpawnedAtCurrentPosition()
     {
@@ -129,9 +127,66 @@ public class ZombieCorpsePositionerTest
 
         Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition);
 
-        Assert.AreEqual(new Vector3i(50, height, 50), position);
+        Assert.AreEqual(new Vector3i(startingPosition.x, height, startingPosition.z), position);
     }
-    
+
+    [Test]
+    public void WhenCurrentPositionIsInBetweenTwoFloorsAndContainsCorpseThenCorpseIsSpawnedInAdjacentPositionOnSameFloor()
+    {
+        int height = GROUND_HEIGHT + 1;
+
+        Vector3i startingPosition = new Vector3i(50, height, 50);
+        for (int x = startingPosition.x - 1; x <= startingPosition.x + 1; x++)
+        {
+            for (int z = startingPosition.z - 1; z <= startingPosition.z + 1; z++)
+            {
+                SetBlockAt(new Vector3i(x, startingPosition.y - 2, z), GenerateEmptyBlock());
+                SetBlockAt(new Vector3i(x, startingPosition.y + 1, z), GenerateOccupiedBlock());
+            }
+        }
+        SetBlockAt(startingPosition, GenerateGoreBlock());
+
+        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition);
+
+        int deltaX = Math.Abs(position.x - startingPosition.x);
+        int deltaZ = Math.Abs(position.z - startingPosition.z);
+        Assert.LessOrEqual(deltaX, 1);
+        Assert.LessOrEqual(deltaZ, 1);
+        Assert.Greater(deltaX + deltaZ, 0);
+        Assert.AreEqual(height, position.y);
+    }
+
+    [Test]
+    public void WhenCurrentPositionContainsCorpseAndAdjacentPositionsAreGroundWithAirAboveAndBelowThenCorpseIsSpawnedInAdjacentPositionAboveGround()
+    {
+        int height = GROUND_HEIGHT + 1;
+
+        Vector3i startingPosition = new Vector3i(50, height, 50);
+
+        for (int x = startingPosition.x - 1; x <= startingPosition.x + 1; x++)
+        {
+            for (int z = startingPosition.z - 1; z <= startingPosition.z + 1; z++)
+            {
+                if (x != 0 || z != 0)
+                {
+                    SetBlockAt(new Vector3i(x, startingPosition.y - 2, z), GenerateEmptyBlock());
+                    SetBlockAt(new Vector3i(x, startingPosition.y, z), GenerateOccupiedBlock());
+                    SetBlockAt(new Vector3i(x, startingPosition.y + 1, z), GenerateOccupiedBlock());
+                }
+            }
+        }
+        SetBlockAt(startingPosition, GenerateGoreBlock());
+
+        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition);
+
+        int deltaX = Math.Abs(position.x - startingPosition.x);
+        int deltaZ = Math.Abs(position.z - startingPosition.z);
+        Assert.LessOrEqual(deltaX, 1);
+        Assert.LessOrEqual(deltaZ, 1);
+        Assert.Greater(deltaX + deltaZ, 0);
+        Assert.AreEqual(height + 2, position.y);
+    }
+
     private IBlock GetBlockAt(Vector3i position)
     {
         return fakeWorld[position.x, position.y, position.z];
