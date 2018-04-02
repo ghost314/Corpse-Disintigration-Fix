@@ -4,10 +4,10 @@
     private readonly int MIN_HEIGHT;
     private readonly ZombieCorpsePositioner.GetBlock getBlock;
 
-    public GroundFinder(int maxHeight, int minHeight, ZombieCorpsePositioner.GetBlock getBlock)
+    public GroundFinder(Configuration config, ZombieCorpsePositioner.GetBlock getBlock)
     {
-        MAX_HEIGHT = maxHeight;
-        MIN_HEIGHT = minHeight;
+        MAX_HEIGHT = config.MAX_HEIGHT;
+        MIN_HEIGHT = config.MIN_HEIGHT;
         this.getBlock = getBlock;
     }
 

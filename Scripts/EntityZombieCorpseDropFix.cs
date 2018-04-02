@@ -13,9 +13,10 @@ public class EntityZombieCorpseDropFix : EntityZombie
             return Vector3i.zero;
         }
         ZombieCorpsePositioner.GetBlock blockFinder = location => new BlockWrapper(world.GetBlock(location).Block);
-        ZombieCorpsePositioner positioner = new ZombieCorpsePositioner(Debug.Log, blockFinder, new GroundFinder(MAX_HEIGHT, MIN_HEIGHT, blockFinder), MAX_SEARCH_RADIUS, MAX_HEIGHT, MIN_HEIGHT);
+        Configuration config = new Configuration(MAX_HEIGHT, MIN_HEIGHT, MAX_SEARCH_RADIUS);
+        ZombieCorpsePositioner positioner = new ZombieCorpsePositioner(Debug.Log, blockFinder, new GroundFinder(config, blockFinder), config);
         Vector3i newPosition = positioner.FindSpawnLocationStartingFrom(World.worldToBlockPos(position));
-        this.position = new Vector3(newPosition.x, newPosition.y, newPosition.z);
+        position = new Vector3(newPosition.x, newPosition.y, newPosition.z);
         return base.dropCorpseBlock();
     }
 }

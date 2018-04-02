@@ -13,7 +13,8 @@ public class ZombieCorpsePositionerTest
     [SetUp]
     public void SetUp()
     {
-        positioner = new ZombieCorpsePositioner(Console.WriteLine, GetBlockAt, new GroundFinder(WORLD_HEIGHT, 0, GetBlockAt), 5, WORLD_HEIGHT, 0);
+        Configuration config = new Configuration(WORLD_HEIGHT, 0, 5);
+        positioner = new ZombieCorpsePositioner(Console.WriteLine, GetBlockAt, new GroundFinder(config, GetBlockAt), config);
 
         for (int x = 0; x < WORLD_LENGTH; x++)
         {

@@ -11,14 +11,14 @@
     private readonly GetBlock getBlock;
     private readonly GroundFinder groundFinder;
 
-    public ZombieCorpsePositioner(Logger log, GetBlock getBlock, GroundFinder groundFinder, int searchRadius, int maxHeight, int minHeight)
+    public ZombieCorpsePositioner(Logger log, GetBlock getBlock, GroundFinder groundFinder, Configuration config)
     {
         this.log = log;
         this.getBlock = getBlock;
         this.groundFinder = groundFinder;
-        MAX_SEARCH_RADIUS = searchRadius;
-        MAX_HEIGHT = maxHeight;
-        MIN_HEIGHT = minHeight;
+        MAX_SEARCH_RADIUS = config.MAX_SEARCH_RADIUS;
+        MAX_HEIGHT = config.MAX_HEIGHT;
+        MIN_HEIGHT = config.MIN_HEIGHT;
     }
 
     public Vector3i FindSpawnLocationStartingFrom(Vector3i origin)
