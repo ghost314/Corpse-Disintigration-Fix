@@ -12,7 +12,8 @@ public class EntityZombieCorpseDropFix : EntityZombie
         {
             return Vector3i.zero;
         }
-        ZombieCorpsePositioner positioner = new ZombieCorpsePositioner(Debug.Log, location => new BlockWrapper(world.GetBlock(location).Block));
+        ZombieCorpsePositioner.GetBlock blockFinder = location => new BlockWrapper(world.GetBlock(location).Block);
+        ZombieCorpsePositioner positioner = new ZombieCorpsePositioner(Debug.Log, blockFinder, new GroundFinder(MAX_HEIGHT, MIN_HEIGHT, blockFinder), MAX_SEARCH_RADIUS, MAX_HEIGHT, MIN_HEIGHT);
         Vector3i newPosition = positioner.FindSpawnLocationStartingFrom(World.worldToBlockPos(position));
         this.position = new Vector3(newPosition.x, newPosition.y, newPosition.z);
         return base.dropCorpseBlock();

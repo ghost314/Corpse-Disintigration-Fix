@@ -1,19 +1,24 @@
 ﻿public class ZombieCorpsePositioner
 {
-    private const int MAX_SEARCH_RADIUS = 200;
-    private const int MAX_HEIGHT = 254;
-    private const int MIN_HEIGHT = 3;
+    private readonly int MAX_SEARCH_RADIUS;
+    private readonly int MAX_HEIGHT;
+    private readonly int MIN_HEIGHT;
 
     public delegate void Logger(string msg);
     public delegate IBlock GetBlock(Vector3i location);
 
-    private Logger log;
-    private GetBlock getBlock;
+    private readonly Logger log;
+    private readonly GetBlock getBlock;
+    private readonly GroundFinder groundFinder;
 
-    public ZombieCorpsePositioner(Logger log, GetBlock getBlock)
+    public ZombieCorpsePositioner(Logger log, GetBlock getBlock, GroundFinder groundFinder, int searchRadius, int maxHeight, int minHeight)
     {
         this.log = log;
         this.getBlock = getBlock;
+        this.groundFinder = groundFinder;
+        MAX_SEARCH_RADIUS = searchRadius;
+        MAX_HEIGHT = maxHeight;
+        MIN_HEIGHT = minHeight;
     }
 
     public Vector3i FindSpawnLocationStartingFrom(Vector3i origin)
@@ -101,7 +106,7 @@
 
     private Vector3i FindValidSpawnPointAt(Vector3i location)
     {
-        location.y = FindPositionAboveGroundAt(location);
+        location.y = groundFinder.FindPositionAboveGroundAt(location);
         if (location.y < MIN_HEIGHT)
         {
             return Vector3i.zero;
@@ -125,61 +130,4 @@
         return false;
     }
 
-    private int FindPositionAboveGroundAt(Vector3i location)
-    {
-        IBlock currentBlock = getBlock(location);
-        if (currentBlock.IsCollideMovement)
-        {
-            int airBlock = FindEmptySpaceAt(location);
-            location.y = airBlock;
-        }
-        int groundPosition = FindGroundBelow(location);
-        if (groundPosition < MIN_HEIGHT)
-        {
-            return -1;
-        }
-        return groundPosition + 1;
-    }
-
-    private int FindEmptySpaceAt(Vector3i location)
-    {
-        int emptySpaceAboveLocation = FindEmptySpaceAbove(location);
-        if (emptySpaceAboveLocation != -1)
-            return emptySpaceAboveLocation;
-        return FindEmptySpaceBelow(location);
-
-    }
-
-    private int FindEmptySpaceAbove(Vector3i location)
-    {
-        location.y++;
-        for (; location.y < MAX_HEIGHT; location.y++)
-        {
-            if (!getBlock(location).IsCollideMovement)
-                return location.y;
-        }
-        return -1;
-    }
-
-    private int FindEmptySpaceBelow(Vector3i location)
-    {
-        location.y--;
-        for (; location.y >= MIN_HEIGHT; location.y--)
-        {
-            if (!getBlock(location).IsCollideMovement)
-                return location.y;
-        }
-        return -1;
-    }
-
-    private int FindGroundBelow(Vector3i location)
-    {
-        location.y--;
-        for (; location.y >= MIN_HEIGHT; location.y--)
-        {
-            if (getBlock(location).IsCollideMovement)
-                return location.y;
-        }
-        return -1;
-    }
 }
