@@ -117,7 +117,7 @@ public class ZombieCorpsePositionerTest
         Assert.Greater(deltaX + deltaZ, 0);
         Assert.AreEqual(height - 1, position.y);
     }
-    /*
+    
     [Test]
     public void WhenCurrentPositionIsInBetweenTwoFloorsThenCorpseIsSpawnedAtCurrentPosition()
     {
@@ -131,7 +131,7 @@ public class ZombieCorpsePositionerTest
 
         Assert.AreEqual(new Vector3i(50, height, 50), position);
     }
-    */
+    
     private IBlock GetBlockAt(Vector3i position)
     {
         return fakeWorld[position.x, position.y, position.z];
