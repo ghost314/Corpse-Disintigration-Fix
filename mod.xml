@@ -9,6 +9,5 @@
 		<type>QoL</type>
 	</info>
 	<config_mods>
-		<import file="Configs\EntityClasses.xml" />
 	</config_mods>
 </mod>
