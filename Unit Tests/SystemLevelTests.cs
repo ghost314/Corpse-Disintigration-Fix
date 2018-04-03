@@ -14,7 +14,7 @@ class SystemLevelTests
     {
         Configuration config = new Configuration(WORLD_HEIGHT, 0, SEARCH_RADIUS);
         fakeWorld = new FakeWorld(config);
-        positioner = new ZombieCorpsePositioner(Console.WriteLine, fakeWorld.GetBlockAt, new GroundFinder(config, fakeWorld.GetBlockAt), config);
+        positioner = new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).BlockTag == BlockTags.Gore, new GroundFinder(config, location => fakeWorld.GetBlockAt(location).IsCollideMovement), config);
     }
 
     [SetUp]
@@ -298,7 +298,7 @@ class SystemLevelTests
         {
             for (int z = startingPosition.z - SEARCH_RADIUS; z <= startingPosition.z + SEARCH_RADIUS; z++)
             {
-                for(int y=0; y<WORLD_HEIGHT; y++)
+                for (int y = 0; y < WORLD_HEIGHT; y++)
                 {
                     fakeWorld.SetBlockAt(new Vector3i(x, y, z), fakeWorld.GenerateOccupiedBlock());
                 }

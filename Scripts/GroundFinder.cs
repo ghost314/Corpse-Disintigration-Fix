@@ -1,20 +1,20 @@
 ﻿public class GroundFinder : IGroundFinder
 {
+    public delegate bool IsMovementRestrictingBlock(Vector3i location);
     private readonly int MAX_HEIGHT;
     private readonly int MIN_HEIGHT;
-    private readonly ZombieCorpsePositioner.GetBlock getBlock;
+    private readonly IsMovementRestrictingBlock isMovementRestrictingBlock;
 
-    public GroundFinder(Configuration config, ZombieCorpsePositioner.GetBlock getBlock)
+    public GroundFinder(Configuration config, IsMovementRestrictingBlock isMovementRestrictingBlock)
     {
         MAX_HEIGHT = config.MAX_HEIGHT;
         MIN_HEIGHT = config.MIN_HEIGHT;
-        this.getBlock = getBlock;
+        this.isMovementRestrictingBlock = isMovementRestrictingBlock;
     }
 
     public int FindPositionAboveGroundAt(Vector3i location)
     {
-        IBlock currentBlock = getBlock(location);
-        if (currentBlock.IsCollideMovement)
+        if (isMovementRestrictingBlock(location))
         {
             int airBlock = FindEmptySpaceAt(location);
             location.y = airBlock;
@@ -41,7 +41,7 @@
         location.y++;
         for (; location.y < MAX_HEIGHT; location.y++)
         {
-            if (!getBlock(location).IsCollideMovement)
+            if (!isMovementRestrictingBlock(location))
                 return location.y;
         }
         return -1;
@@ -52,7 +52,7 @@
         location.y--;
         for (; location.y >= MIN_HEIGHT; location.y--)
         {
-            if (!getBlock(location).IsCollideMovement)
+            if (!isMovementRestrictingBlock(location))
                 return location.y;
         }
         return -1;
@@ -63,7 +63,7 @@
         location.y--;
         for (; location.y >= MIN_HEIGHT; location.y--)
         {
-            if (getBlock(location).IsCollideMovement)
+            if (isMovementRestrictingBlock(location))
                 return location.y;
         }
         return -1;

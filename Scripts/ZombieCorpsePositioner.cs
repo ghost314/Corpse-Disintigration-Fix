@@ -5,16 +5,16 @@
     private readonly int MIN_HEIGHT;
 
     public delegate void Logger(string msg);
-    public delegate IBlock GetBlock(Vector3i location);
+    public delegate bool IsGoreBlock(Vector3i location);
 
     private readonly Logger log;
-    private readonly GetBlock getBlock;
+    private readonly IsGoreBlock isGoreBlock;
     private readonly IGroundFinder groundFinder;
 
-    public ZombieCorpsePositioner(Logger log, GetBlock getBlock, IGroundFinder groundFinder, Configuration config)
+    public ZombieCorpsePositioner(Logger log, IsGoreBlock isGoreBlock, IGroundFinder groundFinder, Configuration config)
     {
         this.log = log;
-        this.getBlock = getBlock;
+        this.isGoreBlock = isGoreBlock;
         this.groundFinder = groundFinder;
         MAX_SEARCH_RADIUS = config.MAX_SEARCH_RADIUS;
         MAX_HEIGHT = config.MAX_HEIGHT;
@@ -121,9 +121,8 @@
     private bool HasGoreBlock(Vector3i location)
     {
         log("Checking for gore blocks at: " + location.x + "," + location.y + "," + location.z);
-        IBlock block = getBlock(location);
 
-        if (block.BlockTag == BlockTags.Gore)
+        if (isGoreBlock(location))
             return true;
 
         log("No gore blocks at: " + location.x + "," + location.y + "," + location.z);

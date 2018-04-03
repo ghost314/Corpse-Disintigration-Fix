@@ -13,7 +13,7 @@ public class GroundFinderTest
     {
         Configuration config = new Configuration(WORLD_HEIGHT, 0, 5);
         fakeWorld = new FakeWorld(config);
-        groundFinder = new GroundFinder(config, fakeWorld.GetBlockAt);
+        groundFinder = new GroundFinder(config, location => fakeWorld.GetBlockAt(location).IsCollideMovement);
     }
 
     [SetUp]

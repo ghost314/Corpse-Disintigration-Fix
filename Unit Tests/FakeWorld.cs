@@ -1,10 +1,10 @@
 ﻿class FakeWorld
 {
-    private IBlock[,,] fakeWorld;
+    private FakeBlock[,,] fakeWorld;
 
     public FakeWorld(Configuration config)
     {
-        fakeWorld = new IBlock[(config.MAX_SEARCH_RADIUS * 2) + 1, config.MAX_HEIGHT, (config.MAX_SEARCH_RADIUS * 2) + 1];
+        fakeWorld = new FakeBlock[(config.MAX_SEARCH_RADIUS * 2) + 1, config.MAX_HEIGHT, (config.MAX_SEARCH_RADIUS * 2) + 1];
     }
 
     public void ResetWorld(int groundHeight)
@@ -15,7 +15,7 @@
             {
                 for (int z = 0; z < fakeWorld.GetLength(2); z++)
                 {
-                    IBlock nextBlock;
+                    FakeBlock nextBlock;
                     if (y <= groundHeight)
                         nextBlock = GenerateOccupiedBlock();
                     else
@@ -26,32 +26,32 @@
         }
     }
 
-    public IBlock GetBlockAt(Vector3i position)
+    public FakeBlock GetBlockAt(Vector3i position)
     {
         return fakeWorld[position.x, position.y, position.z];
     }
 
-    public void SetBlockAt(Vector3i position, IBlock block)
+    public void SetBlockAt(Vector3i position, FakeBlock block)
     {
         fakeWorld[position.x, position.y, position.z] = block;
     }
 
-    public IBlock GenerateOccupiedBlock()
+    public FakeBlock GenerateOccupiedBlock()
     {
         return new FakeBlock(BlockTags.None, true);
     }
 
-    public IBlock GenerateGoreBlock()
+    public FakeBlock GenerateGoreBlock()
     {
         return new FakeBlock(BlockTags.Gore, false);
     }
 
-    public IBlock GenerateEmptyBlock()
+    public FakeBlock GenerateEmptyBlock()
     {
         return new FakeBlock(BlockTags.None, false);
     }
 
-    private class FakeBlock : IBlock
+    public class FakeBlock
     {
         private BlockTags tag;
         private bool isCollideMovement;

@@ -26,6 +26,14 @@ public class EntityZombieCorpseDropPatch : IPatcherMod
         return true;
     }
 
+    private void MakeBlockImplementIBlock(ModuleDefinition gameModule, ModuleDefinition modModule)
+    {
+        TypeDefinition blockClass = gameModule.Types.First(type => type.Name.Equals("Block"));
+        TypeDefinition iblockInterface = modModule.Types.First(type => type.Name.Equals("IBlock"));
+
+        blockClass.Interfaces.Add(iblockInterface);
+    }
+
     private MethodDefinition GetCorpseDropMethodToAlter(ModuleDefinition gameModule)
     {
         TypeDefinition entityZombie = gameModule.Types.First(type => type.Name.Equals("EntityZombie"));
