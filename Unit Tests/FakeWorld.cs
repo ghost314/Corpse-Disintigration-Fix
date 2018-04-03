@@ -4,7 +4,7 @@
 
     public FakeWorld(Configuration config)
     {
-        fakeWorld = new IBlock[config.MAX_SEARCH_RADIUS * 2, config.MAX_HEIGHT, config.MAX_SEARCH_RADIUS * 2];
+        fakeWorld = new IBlock[(config.MAX_SEARCH_RADIUS * 2) + 1, config.MAX_HEIGHT, (config.MAX_SEARCH_RADIUS * 2) + 1];
     }
 
     public void ResetWorld(int groundHeight)

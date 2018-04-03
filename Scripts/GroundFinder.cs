@@ -1,4 +1,4 @@
-﻿public class GroundFinder
+﻿public class GroundFinder : IGroundFinder
 {
     private readonly int MAX_HEIGHT;
     private readonly int MIN_HEIGHT;

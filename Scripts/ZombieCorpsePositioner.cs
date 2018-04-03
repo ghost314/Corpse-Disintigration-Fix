@@ -9,9 +9,9 @@
 
     private readonly Logger log;
     private readonly GetBlock getBlock;
-    private readonly GroundFinder groundFinder;
+    private readonly IGroundFinder groundFinder;
 
-    public ZombieCorpsePositioner(Logger log, GetBlock getBlock, GroundFinder groundFinder, Configuration config)
+    public ZombieCorpsePositioner(Logger log, GetBlock getBlock, IGroundFinder groundFinder, Configuration config)
     {
         this.log = log;
         this.getBlock = getBlock;
