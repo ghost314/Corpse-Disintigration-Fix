@@ -109,24 +109,13 @@
         location.y = groundFinder.FindPositionAboveGroundAt(location);
         if (location.y < MIN_HEIGHT)
         {
+            log("Corpse Disintigration Fix: Unable to find ground position starting from: " + location);
             return Vector3i.zero;
         }
-        if (!HasGoreBlock(location))
+        if (!isGoreBlock(location))
         {
             return location;
         }
         return Vector3i.zero;
     }
-
-    private bool HasGoreBlock(Vector3i location)
-    {
-        log("Checking for gore blocks at: " + location.x + "," + location.y + "," + location.z);
-
-        if (isGoreBlock(location))
-            return true;
-
-        log("No gore blocks at: " + location.x + "," + location.y + "," + location.z);
-        return false;
-    }
-
 }
