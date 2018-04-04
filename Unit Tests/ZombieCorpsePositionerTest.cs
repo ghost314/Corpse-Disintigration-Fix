@@ -7,6 +7,7 @@ public class ZombieCorpsePositionerTest
     private const int WORLD_HEIGHT = 20;
     private const int GROUND_HEIGHT = 10;
     private const int SEARCH_RADIUS = 5;
+    private const int CACHE_PERSISTANCE = 1;
     private ZombieCorpsePositioner positioner;
     private FakeWorld fakeWorld;
     private FakeGroundFinder groundFinder;
@@ -14,7 +15,7 @@ public class ZombieCorpsePositionerTest
     [OneTimeSetUp]
     public void Init()
     {
-        Configuration config = new Configuration(WORLD_HEIGHT, 0, SEARCH_RADIUS);
+        Configuration config = new Configuration(WORLD_HEIGHT, 0, SEARCH_RADIUS, CACHE_PERSISTANCE);
         fakeWorld = new FakeWorld(config);
         groundFinder = new FakeGroundFinder();
         positioner = new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).BlockTag == BlockTags.Gore, groundFinder, config);

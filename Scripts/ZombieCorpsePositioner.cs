@@ -109,7 +109,7 @@
         location.y = groundFinder.FindPositionAboveGroundAt(location);
         if (location.y < MIN_HEIGHT)
         {
-            log("Corpse Disintigration Fix: Unable to find ground position starting from: " + location);
+            log("Unable to find ground position starting from: " + location);
             return Vector3i.zero;
         }
         if (!isGoreBlock(location))

@@ -6,20 +6,28 @@ class SystemLevelTests
     private const int WORLD_HEIGHT = 20;
     private const int GROUND_HEIGHT = 10;
     private const int SEARCH_RADIUS = 5;
+    private const int CACHE_PERSISTANCE = 1;
+    private ulong tick;
     private ZombieCorpsePositioner positioner;
     private FakeWorld fakeWorld;
 
     [OneTimeSetUp]
     public void Init()
     {
-        Configuration config = new Configuration(WORLD_HEIGHT, 0, SEARCH_RADIUS);
+        Configuration config = new Configuration(WORLD_HEIGHT, 0, SEARCH_RADIUS, CACHE_PERSISTANCE);
         fakeWorld = new FakeWorld(config);
-        positioner = new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).BlockTag == BlockTags.Gore, new GroundFinder(config, location => fakeWorld.GetBlockAt(location).IsCollideMovement), config);
+        positioner = new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).BlockTag == BlockTags.Gore, new GroundFinder(config, location => fakeWorld.GetBlockAt(location).IsCollideMovement, GetTick, new GroundPositionCache()), config);
+    }
+
+    private ulong GetTick()
+    {
+        return tick;
     }
 
     [SetUp]
     public void SetUp()
     {
+        tick += CACHE_PERSISTANCE+1;
         fakeWorld.ResetWorld(GROUND_HEIGHT);
     }
 
