@@ -4,8 +4,14 @@ using System.Collections.Generic;
 public class GroundPositionCache
 {
     private readonly Dictionary<Vector2i, List<HeightRange>> groundForPosition = new Dictionary<Vector2i, List<HeightRange>>();
+    private readonly ICacheTimer timer;
 
-    public void CacheGroundPositionForSingleLocation(Vector3i position, int height)
+    public GroundPositionCache(ICacheTimer timer)
+    {
+        this.timer = timer;
+    }
+
+    public void CacheGroundPositionForLocation(Vector3i position, int height)
     {
         Vector2i queryPosition = new Vector2i(position.x, position.z);
         List<HeightRange> ranges;
@@ -42,6 +48,7 @@ public class GroundPositionCache
 
     public bool GetGroundPositionFor(Vector3i position, out int height)
     {
+        ClearOldEntries();
         Vector2i queryPosition = new Vector2i(position.x, position.z);
         List<HeightRange> ranges = new List<HeightRange>();
         if (groundForPosition.TryGetValue(queryPosition, out ranges))
@@ -57,6 +64,12 @@ public class GroundPositionCache
         }
         height = 0;
         return false;
+    }
+
+    private void ClearOldEntries()
+    {
+        if (!timer.IsCacheStillValid())
+            Clear();
     }
 
     public void Clear()

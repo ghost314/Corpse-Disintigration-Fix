@@ -1,41 +1,27 @@
 ﻿public class GroundFinder : IGroundFinder
 {
     public delegate bool IsMovementRestrictingBlock(Vector3i location);
-    public delegate ulong Timer();
     private readonly int MAX_HEIGHT;
     private readonly int MIN_HEIGHT;
-    private readonly uint CACHE_PERSISTANCE;
     private readonly IsMovementRestrictingBlock isMovementRestrictingBlock;
-    private readonly Timer timer;
     private readonly GroundPositionCache cache;
-    private ulong lastCheckTime;
 
-    public GroundFinder(Configuration config, IsMovementRestrictingBlock isMovementRestrictingBlock, Timer timer, GroundPositionCache cache)
+    public GroundFinder(Configuration config, IsMovementRestrictingBlock isMovementRestrictingBlock, GroundPositionCache cache)
     {
         MAX_HEIGHT = config.MAX_HEIGHT;
         MIN_HEIGHT = config.MIN_HEIGHT;
-        CACHE_PERSISTANCE = config.CACHE_PERSISTANCE;
         this.isMovementRestrictingBlock = isMovementRestrictingBlock;
-        this.timer = timer;
         this.cache = cache;
-        lastCheckTime = 0;
     }
 
     public int FindPositionAboveGroundAt(Vector3i location)
     {
         int groundPosition = -1;
-        if (timer() - lastCheckTime < CACHE_PERSISTANCE)
+        if (cache.GetGroundPositionFor(location, out groundPosition))
         {
-            if (cache.GetGroundPositionFor(location, out groundPosition))
-            {
-                lastCheckTime = timer();
-                return groundPosition;
-            }
+            return groundPosition;
         }
-        else
-            cache.Clear();
 
-        lastCheckTime = timer();
         int originalHeight = location.y;
         if (isMovementRestrictingBlock(location))
         {
@@ -49,11 +35,11 @@
         location.y = originalHeight;
         if (groundPosition < MIN_HEIGHT)
         {
-            cache.CacheGroundPositionForSingleLocation(location, -1);
+            cache.CacheGroundPositionForLocation(location, -1);
             return -1;
         }
         groundPosition++;
-        cache.CacheGroundPositionForSingleLocation(location, groundPosition);
+        cache.CacheGroundPositionForLocation(location, groundPosition);
         return groundPosition;
     }
 

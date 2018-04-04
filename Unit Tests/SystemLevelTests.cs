@@ -1,7 +1,8 @@
 ﻿using NUnit.Framework;
 using System;
 
-class SystemLevelTests
+[TestFixture]
+public class SystemLevelTests
 {
     private const int WORLD_HEIGHT = 20;
     private const int GROUND_HEIGHT = 10;
@@ -16,7 +17,7 @@ class SystemLevelTests
     {
         Configuration config = new Configuration(WORLD_HEIGHT, 0, SEARCH_RADIUS, CACHE_PERSISTANCE);
         fakeWorld = new FakeWorld(config);
-        positioner = new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).BlockTag == BlockTags.Gore, new GroundFinder(config, location => fakeWorld.GetBlockAt(location).IsCollideMovement, GetTick, new GroundPositionCache()), config);
+        positioner = new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).BlockTag == BlockTags.Gore, new GroundFinder(config, location => fakeWorld.GetBlockAt(location).IsCollideMovement, new GroundPositionCache(new CacheTimer(config.CACHE_PERSISTANCE, GetTick))), config);
     }
 
     private ulong GetTick()
@@ -27,7 +28,7 @@ class SystemLevelTests
     [SetUp]
     public void SetUp()
     {
-        tick += CACHE_PERSISTANCE+1;
+        tick += CACHE_PERSISTANCE + 1;
         fakeWorld.ResetWorld(GROUND_HEIGHT);
     }
 

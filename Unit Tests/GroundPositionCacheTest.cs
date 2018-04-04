@@ -1,12 +1,22 @@
 ﻿using NUnit.Framework;
 
+[TestFixture]
 public class GroundPositionCacheTest
 {
-    private GroundPositionCache cache = new GroundPositionCache();
+    private FakeCacheTimer fakeTimer;
+    private GroundPositionCache cache;
+
+    [OneTimeSetUp]
+    public void Init()
+    {
+        fakeTimer = new FakeCacheTimer();
+        cache = new GroundPositionCache(fakeTimer);
+    }
 
     [SetUp]
     public void Setup()
     {
+        fakeTimer.IsCacheValid = true;
         cache.Clear();
     }
 
@@ -16,7 +26,7 @@ public class GroundPositionCacheTest
         int groundHeight = 27;
         Vector3i startingPosition = new Vector3i(2, 3, 7);
 
-        cache.CacheGroundPositionForSingleLocation(startingPosition, groundHeight);
+        cache.CacheGroundPositionForLocation(startingPosition, groundHeight);
 
         int cachedHeight = -1;
         bool valueExists = cache.GetGroundPositionFor(startingPosition, out cachedHeight);
@@ -41,8 +51,23 @@ public class GroundPositionCacheTest
         int groundHeight = 27;
         Vector3i startingPosition = new Vector3i(2, 3, 7);
 
-        cache.CacheGroundPositionForSingleLocation(startingPosition, groundHeight);
+        cache.CacheGroundPositionForLocation(startingPosition, groundHeight);
         cache.Clear();
+
+        int cachedHeight = 27;
+        bool valueExists = cache.GetGroundPositionFor(startingPosition, out cachedHeight);
+        Assert.That(valueExists, Is.False);
+        Assert.That(cachedHeight, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void WhenCacheTimerExpiresThenCachedValuesAreCleared()
+    {
+        int groundHeight = 27;
+        Vector3i startingPosition = new Vector3i(2, 3, 7);
+
+        cache.CacheGroundPositionForLocation(startingPosition, groundHeight);
+        fakeTimer.IsCacheValid = false;
 
         int cachedHeight = 27;
         bool valueExists = cache.GetGroundPositionFor(startingPosition, out cachedHeight);
@@ -56,8 +81,8 @@ public class GroundPositionCacheTest
         int groundHeight = 36;
         Vector3i startingPosition = new Vector3i(2, 3, 7);
 
-        cache.CacheGroundPositionForSingleLocation(startingPosition, 27);
-        cache.CacheGroundPositionForSingleLocation(startingPosition, groundHeight);
+        cache.CacheGroundPositionForLocation(startingPosition, 27);
+        cache.CacheGroundPositionForLocation(startingPosition, groundHeight);
 
         int cachedHeight = -1;
         bool valueExists = cache.GetGroundPositionFor(startingPosition, out cachedHeight);
@@ -71,7 +96,7 @@ public class GroundPositionCacheTest
         int groundHeight = 10;
         Vector3i startingPosition = new Vector3i(2, 3, 7);
 
-        cache.CacheGroundPositionForSingleLocation(startingPosition, groundHeight);
+        cache.CacheGroundPositionForLocation(startingPosition, groundHeight);
         startingPosition.y = queryHeight;
 
         int cachedHeight = -1;
@@ -86,7 +111,7 @@ public class GroundPositionCacheTest
         int groundHeight = 3;
         Vector3i startingPosition = new Vector3i(2, 10, 7);
 
-        cache.CacheGroundPositionForSingleLocation(startingPosition, groundHeight);
+        cache.CacheGroundPositionForLocation(startingPosition, groundHeight);
         startingPosition.y = queryHeight;
 
         int cachedHeight = -1;
@@ -101,7 +126,7 @@ public class GroundPositionCacheTest
         int groundHeight = -1;
         Vector3i startingPosition = new Vector3i(2, 1, 7);
 
-        cache.CacheGroundPositionForSingleLocation(startingPosition, groundHeight);
+        cache.CacheGroundPositionForLocation(startingPosition, groundHeight);
         startingPosition.y = queryHeight;
 
         int cachedHeight = -1;
@@ -116,7 +141,7 @@ public class GroundPositionCacheTest
         int groundHeight = 5;
         Vector3i startingPosition = new Vector3i(2, 1, 7);
 
-        cache.CacheGroundPositionForSingleLocation(startingPosition, groundHeight);
+        cache.CacheGroundPositionForLocation(startingPosition, groundHeight);
         startingPosition.y = queryHeight;
 
         int cachedHeight = -1;
@@ -133,8 +158,8 @@ public class GroundPositionCacheTest
         Vector3i startingPositionOne = new Vector3i(2, 1, 7);
         Vector3i startingPositionTwo = new Vector3i(2, 25, 7);
 
-        cache.CacheGroundPositionForSingleLocation(startingPositionOne, groundHeightOne);
-        cache.CacheGroundPositionForSingleLocation(startingPositionTwo, groundHeightTwo);
+        cache.CacheGroundPositionForLocation(startingPositionOne, groundHeightOne);
+        cache.CacheGroundPositionForLocation(startingPositionTwo, groundHeightTwo);
         startingPositionOne.y = 3;
 
         int cachedHeight = -1;
@@ -158,8 +183,8 @@ public class GroundPositionCacheTest
         Vector3i startingPositionOne = new Vector3i(5, 6, 7);
         Vector3i startingPositionTwo = new Vector3i(2, 10, 8);
 
-        cache.CacheGroundPositionForSingleLocation(startingPositionOne, groundHeightOne);
-        cache.CacheGroundPositionForSingleLocation(startingPositionTwo, groundHeightTwo);
+        cache.CacheGroundPositionForLocation(startingPositionOne, groundHeightOne);
+        cache.CacheGroundPositionForLocation(startingPositionTwo, groundHeightTwo);
         startingPositionOne.y = 5;
 
         int cachedHeight = -1;
@@ -183,8 +208,8 @@ public class GroundPositionCacheTest
         Vector3i startingPositionOne = new Vector3i(5, 6, 7);
         Vector3i startingPositionTwo = new Vector3i(2, 6, 8);
 
-        cache.CacheGroundPositionForSingleLocation(startingPositionOne, groundHeightOne);
-        cache.CacheGroundPositionForSingleLocation(startingPositionTwo, groundHeightTwo);
+        cache.CacheGroundPositionForLocation(startingPositionOne, groundHeightOne);
+        cache.CacheGroundPositionForLocation(startingPositionTwo, groundHeightTwo);
         startingPositionOne.y = 6;
 
         int cachedHeight = -1;
@@ -208,8 +233,8 @@ public class GroundPositionCacheTest
         Vector3i startingPositionOne = new Vector3i(5, 6, 7);
         Vector3i startingPositionTwo = new Vector3i(2, 6, 7);
 
-        cache.CacheGroundPositionForSingleLocation(startingPositionOne, groundHeightOne);
-        cache.CacheGroundPositionForSingleLocation(startingPositionTwo, groundHeightTwo);
+        cache.CacheGroundPositionForLocation(startingPositionOne, groundHeightOne);
+        cache.CacheGroundPositionForLocation(startingPositionTwo, groundHeightTwo);
         startingPositionOne.y = 8;
 
         int cachedHeight = -1;
@@ -233,8 +258,8 @@ public class GroundPositionCacheTest
         Vector3i startingPositionOne = new Vector3i(5, 6, 2);
         Vector3i startingPositionTwo = new Vector3i(5, 6, 7);
 
-        cache.CacheGroundPositionForSingleLocation(startingPositionOne, groundHeightOne);
-        cache.CacheGroundPositionForSingleLocation(startingPositionTwo, groundHeightTwo);
+        cache.CacheGroundPositionForLocation(startingPositionOne, groundHeightOne);
+        cache.CacheGroundPositionForLocation(startingPositionTwo, groundHeightTwo);
         startingPositionOne.y = 8;
 
         int cachedHeight = -1;
@@ -257,8 +282,8 @@ public class GroundPositionCacheTest
         Vector3i startingPositionOne = new Vector3i(5, 6, 2);
         Vector3i startingPositionTwo = new Vector3i(5, 15, 2);
 
-        cache.CacheGroundPositionForSingleLocation(startingPositionOne, groundHeight);
-        cache.CacheGroundPositionForSingleLocation(startingPositionTwo, groundHeight);
+        cache.CacheGroundPositionForLocation(startingPositionOne, groundHeight);
+        cache.CacheGroundPositionForLocation(startingPositionTwo, groundHeight);
         startingPositionOne.y = 8;
 
         int cachedHeight = -1;

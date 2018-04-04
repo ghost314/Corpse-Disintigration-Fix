@@ -1,32 +1,30 @@
 ﻿using NUnit.Framework;
 
 
+[TestFixture]
 public class GroundFinderTest
 {
     private const int WORLD_HEIGHT = 20;
     private const int GROUND_HEIGHT = 10;
     private const int CACHE_PERSISTANCE = 1;
-    private ulong tick;
+    private FakeCacheTimer fakeTimer;
     private FakeWorld fakeWorld;
     private GroundFinder groundFinder;
 
     [OneTimeSetUp]
     public void Init()
     {
+        fakeTimer = new FakeCacheTimer();
+        fakeTimer.IsCacheValid = true;
         Configuration config = new Configuration(WORLD_HEIGHT, 0, 5, CACHE_PERSISTANCE);
         fakeWorld = new FakeWorld(config);
-        groundFinder = new GroundFinder(config, location => fakeWorld.GetBlockAt(location).IsCollideMovement, GetTick, new GroundPositionCache());
-    }
-
-    private ulong GetTick()
-    {
-        return tick;
+        groundFinder = new GroundFinder(config, location => fakeWorld.GetBlockAt(location).IsCollideMovement, new GroundPositionCache(fakeTimer));
     }
 
     [SetUp]
     public void SetUp()
     {
-        tick += CACHE_PERSISTANCE + 1;
+        fakeTimer.IsCacheValid = false;
         fakeWorld.ResetWorld(GROUND_HEIGHT);
     }
 
@@ -140,7 +138,7 @@ public class GroundFinderTest
     }
 
     [Test]
-    public void WhenTickDifferenceIsBelowCachePersistanceThenCacheIsUsed()
+    public void WhenCacheIsValidThenCacheIsUsed()
     {
         int height = GROUND_HEIGHT + 1;
 
@@ -148,28 +146,13 @@ public class GroundFinderTest
 
         groundFinder.FindPositionAboveGroundAt(startingPosition);
         fakeWorld.ResetWorld(WORLD_HEIGHT);
+        fakeTimer.IsCacheValid = true;
 
         int groundHeight = groundFinder.FindPositionAboveGroundAt(startingPosition);
 
         Assert.AreEqual(height, groundHeight);
     }
-
-    [Test]
-    public void WhenTickDifferenceIsEqualToCachePersistanceThenCacheIsCleared()
-    {
-        int height = GROUND_HEIGHT + 1;
-
-        Vector3i startingPosition = new Vector3i(5, height, 5);
-
-        groundFinder.FindPositionAboveGroundAt(startingPosition);
-        fakeWorld.ResetWorld(WORLD_HEIGHT);
-        tick += CACHE_PERSISTANCE;
-
-        int groundHeight = groundFinder.FindPositionAboveGroundAt(startingPosition);
-
-        Assert.AreEqual(-1, groundHeight);
-    }
-
+    
     [Test]
     public void WhenCurrentPositionIsInsideGroundAndThereIsNoAirAboveThenResultsAreCachedForAllHigherPositions()
     {
@@ -186,6 +169,7 @@ public class GroundFinderTest
 
         Assert.AreEqual(height - 3, groundHeight);
 
+        fakeTimer.IsCacheValid = true;
         startingPosition.y = WORLD_HEIGHT - 1;
         fakeWorld.ResetWorld(WORLD_HEIGHT);
         groundHeight = groundFinder.FindPositionAboveGroundAt(startingPosition);
@@ -208,6 +192,7 @@ public class GroundFinderTest
 
         Assert.AreEqual(height + 3, groundHeight);
 
+        fakeTimer.IsCacheValid = true;
         startingPosition.y = height + 1;
         fakeWorld.ResetWorld(WORLD_HEIGHT);
         groundHeight = groundFinder.FindPositionAboveGroundAt(startingPosition);

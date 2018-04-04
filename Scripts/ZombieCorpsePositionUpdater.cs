@@ -6,7 +6,7 @@ public static class ZombieCorpsePositionUpdater
 
     private static readonly ZombieCorpsePositioner.IsGoreBlock isGoreBlock = location => GameManager.Instance.World.GetBlock(location).Block.BlockTag == BlockTags.Gore;
     private static readonly GroundFinder.IsMovementRestrictingBlock isMovementRestrictingBlock = location => GameManager.Instance.World.GetBlock(location).Block.IsCollideMovement;
-    private static readonly ZombieCorpsePositioner positioner = new ZombieCorpsePositioner(msg => Debug.Log("Corpse Disintigration Fix: " + msg), isGoreBlock, new GroundFinder(CONFIG, isMovementRestrictingBlock, () => GameTimer.Instance.ticks, new GroundPositionCache()), CONFIG);
+    private static readonly ZombieCorpsePositioner positioner = new ZombieCorpsePositioner(msg => Debug.Log("Corpse Disintigration Fix: " + msg), isGoreBlock, new GroundFinder(CONFIG, isMovementRestrictingBlock, new GroundPositionCache(new CacheTimer(CONFIG.CACHE_PERSISTANCE, () => GameTimer.Instance.ticks))), CONFIG);
 
     public static Vector3 GetUpdatedPosition(Vector3 position)
     {
