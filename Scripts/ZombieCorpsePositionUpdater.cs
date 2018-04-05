@@ -1,13 +1,17 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// This class serves as a bridge, between the 7D2D game engine, and the rest of this mod.
+/// </summary>
 public static class ZombieCorpsePositionUpdater
 {
-    private static readonly Configuration CONFIG = new Configuration(Settings.Default.MAX_HEIGHT, Settings.Default.MIN_HEIGHT, Settings.Default.MAX_SEARCH_RADIUS, Settings.Default.CACHE_PERSISTANCE);
+    private static readonly ZombieCorpsePositioner positioner = ZombieCorpsePositionerFactory.GenerateNewPositioner();
 
-    private static readonly ZombieCorpsePositioner.IsGoreBlock isGoreBlock = location => GameManager.Instance.World.GetBlock(location).Block.BlockTag == BlockTags.Gore;
-    private static readonly GroundFinder.IsMovementRestrictingBlock isMovementRestrictingBlock = location => GameManager.Instance.World.GetBlock(location).Block.IsCollideMovement;
-    private static readonly ZombieCorpsePositioner positioner = new ZombieCorpsePositioner(msg => Debug.Log("Corpse Disintigration Fix: " + msg), isGoreBlock, new GroundFinder(CONFIG, isMovementRestrictingBlock, new GroundPositionCache(new CacheTimer(CONFIG.CACHE_PERSISTANCE, () => GameTimer.Instance.ticks))), CONFIG);
-
+    /// <summary>
+    /// This method is called directly from the core 7D2D game engine, due to the patch script.
+    /// </summary>
+    /// <param name="position">This will be set to the current position of the zombie that needs to spawn a corpse.</param>
+    /// <returns></returns>
     public static Vector3 GetUpdatedPosition(Vector3 position)
     {
         Vector3i newPosition = positioner.FindSpawnLocationStartingFrom(World.worldToBlockPos(position));

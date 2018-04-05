@@ -116,4 +116,10 @@ class CacheTimerTest
 
         Assert.That(cacheTimer.IsCacheStillValid(), Is.True);
     }
+
+    [Test]
+    public void WhenTimerIsNullThenExceptionIsThrown()
+    {
+        Assert.That(() => new CacheTimer(CACHE_PERSISTANCE, null), Throws.ArgumentNullException);
+    }
 }

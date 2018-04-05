@@ -21,6 +21,12 @@ public class GroundPositionCacheTest
     }
 
     [Test]
+    public void WhenTimerIsNullThenExceptionIsThrown()
+    {
+        Assert.That(() => new GroundPositionCache(null), Throws.ArgumentNullException);
+    }
+
+    [Test]
     public void WhenGroundPositionIsCachedForACertainLocationThenItCanBeRecalled()
     {
         int groundHeight = 27;

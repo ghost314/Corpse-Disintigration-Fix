@@ -151,7 +151,7 @@ public class GroundFinderTest
 
         Assert.AreEqual(height, groundHeight);
     }
-    
+
     [Test]
     public void WhenCurrentPositionIsInsideGroundAndThereIsNoAirAboveThenResultsAreCachedForAllHigherPositions()
     {
@@ -197,5 +197,23 @@ public class GroundFinderTest
         groundHeight = groundFinder.FindPositionAboveGroundAt(startingPosition);
 
         Assert.AreEqual(height + 3, groundHeight);
+    }
+
+    [Test]
+    public void WhenConfigurationIsNullThenExceptionIsThrown()
+    {
+        Assert.That(() => new GroundFinder(null, location => fakeWorld.GetBlockAt(location).IsCollideMovement, new GroundPositionCache(fakeTimer)), Throws.ArgumentNullException);
+    }
+
+    [Test]
+    public void WhenDelegateIsNullThenExceptionIsThrown()
+    {
+        Assert.That(() => new GroundFinder(new Configuration(WORLD_HEIGHT, 0, 5, CACHE_PERSISTANCE), null, new GroundPositionCache(fakeTimer)), Throws.ArgumentNullException);
+    }
+
+    [Test]
+    public void WhenCacheIsNullThenExceptionIsThrown()
+    {
+        Assert.That(() => new GroundFinder(new Configuration(WORLD_HEIGHT, 0, 5, CACHE_PERSISTANCE), location => fakeWorld.GetBlockAt(location).IsCollideMovement, null), Throws.ArgumentNullException);
     }
 }

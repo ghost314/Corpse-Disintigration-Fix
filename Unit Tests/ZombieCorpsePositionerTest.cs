@@ -179,4 +179,31 @@ public class ZombieCorpsePositionerTest
 
         Assert.AreEqual(startingPosition, position);
     }
+
+    [Test]
+    public void WhenLoggerIsNullThenExceptionIsThrown()
+    {
+        Configuration config = new Configuration(WORLD_HEIGHT, 0, SEARCH_RADIUS, CACHE_PERSISTANCE);
+        Assert.That(() => new ZombieCorpsePositioner(null, location => fakeWorld.GetBlockAt(location).BlockTag == BlockTags.Gore, groundFinder, config), Throws.ArgumentNullException);
+    }
+
+    [Test]
+    public void WhenGoreBlockDelegateIsNullThenExceptionIsThrown()
+    {
+        Configuration config = new Configuration(WORLD_HEIGHT, 0, SEARCH_RADIUS, CACHE_PERSISTANCE);
+        Assert.That(() => new ZombieCorpsePositioner(Console.WriteLine, null, groundFinder, config), Throws.ArgumentNullException);
+    }
+
+    [Test]
+    public void WhenGroundFinderIsNullThenExceptionIsThrown()
+    {
+        Configuration config = new Configuration(WORLD_HEIGHT, 0, SEARCH_RADIUS, CACHE_PERSISTANCE);
+        Assert.That(() => new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).BlockTag == BlockTags.Gore, null, config), Throws.ArgumentNullException);
+    }
+
+    [Test]
+    public void WhenConfigIsNullThenExceptionIsThrown()
+    {
+        Assert.That(() => new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).BlockTag == BlockTags.Gore, groundFinder, null), Throws.ArgumentNullException);
+    }
 }
