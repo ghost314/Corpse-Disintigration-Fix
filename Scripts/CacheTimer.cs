@@ -23,7 +23,9 @@ public class CacheTimer : ICacheTimer
     public CacheTimer(uint cachePersistance, Timer timer)
     {
         CACHE_PERSISTANCE = cachePersistance;
-        this.timer = timer ?? throw new ArgumentNullException("timer", "The given timer must not be null");
+        if (timer == null)
+            throw new ArgumentNullException("timer", "The given timer must not be null");
+        this.timer = timer;
         lastResetTime = 0;
     }
 
@@ -34,7 +36,7 @@ public class CacheTimer : ICacheTimer
     public bool IsCacheStillValid()
     {
         ulong time = timer();
-        if(time - lastResetTime < CACHE_PERSISTANCE)
+        if (time - lastResetTime < CACHE_PERSISTANCE)
             return true;
         lastResetTime = time;
         return false;

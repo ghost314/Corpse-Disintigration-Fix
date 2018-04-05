@@ -11,7 +11,7 @@ public static class ZombieCorpsePositionUpdater
     /// This method is called directly from the core 7D2D game engine, due to the patch script.
     /// </summary>
     /// <param name="position">This will be set to the current position of the zombie that needs to spawn a corpse.</param>
-    /// <returns></returns>
+    /// <returns>The new position that the zombie corpse should spawn at.</returns>
     public static Vector3 GetUpdatedPosition(Vector3 position)
     {
         Vector3i newPosition = positioner.FindSpawnLocationStartingFrom(World.worldToBlockPos(position));

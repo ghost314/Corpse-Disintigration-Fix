@@ -13,7 +13,7 @@ public static class ZombieCorpsePositionerFactory
     {
         Configuration CONFIG = new Configuration(Settings.Default.MAX_HEIGHT, Settings.Default.MIN_HEIGHT, Settings.Default.MAX_SEARCH_RADIUS, Settings.Default.CACHE_PERSISTANCE);
 
-        ZombieCorpsePositioner.IsGoreBlock isGoreBlock = location => GameManager.Instance.World.GetBlock(location).Block.BlockTag == BlockTags.Gore;
+        ZombieCorpsePositioner.IsStableBlock isStableBlock = location => GameManager.Instance.World.GetBlock(location).Block.StabilitySupport;
         GroundFinder.IsMovementRestrictingBlock isMovementRestrictingBlock = location => GameManager.Instance.World.GetBlock(location).Block.IsCollideMovement;
         ZombieCorpsePositioner.Logger log = msg => Debug.Log("Corpse Disintigration Fix: " + msg);
 
@@ -21,6 +21,6 @@ public static class ZombieCorpsePositionerFactory
         GroundPositionCache cache = new GroundPositionCache(cacheTimer);
         IGroundFinder groundFinder = new GroundFinder(CONFIG, isMovementRestrictingBlock, cache);
 
-        return new ZombieCorpsePositioner(log, isGoreBlock, groundFinder, CONFIG);
+        return new ZombieCorpsePositioner(log, isStableBlock, groundFinder, CONFIG);
     }
 }

@@ -3,7 +3,10 @@
 /// <summary>
 /// The main purpose of this class, is to take a certain starting position (where a zombie died) and find a reasonable place to spawn its corpse.
 /// <para>
-/// This class makes use of an IGroundFinder and a delegate method that checks if a particular block is a zombie corpse to implement its algorithm.
+/// This class makes use of an IGroundFinder and a delegate method that checks if a particular block is stable, in order to implement its algorithm.
+/// </para>
+/// <para>
+/// A block is considered to be 'stable' if it's normally capable of supporting other blocks being laid down on top of it.
 /// </para>
 /// </summary>
 public class ZombieCorpsePositioner
@@ -19,29 +22,35 @@ public class ZombieCorpsePositioner
     public delegate void Logger(string msg);
 
     /// <summary>
-    /// A delegate method to check whether or not a particular position is already occupied by a corpse.
+    /// A delegate method to check whether or not a particular position is occupied by a stable block.
     /// </summary>
     /// <param name="location">The position to check</param>
-    /// <returns>True IFF the given location is occupied by a corpse.</returns>
-    public delegate bool IsGoreBlock(Vector3i location);
+    /// <returns>True IFF the given location is occupied by a stable block.</returns>
+    public delegate bool IsStableBlock(Vector3i location);
 
     private readonly Logger log;
-    private readonly IsGoreBlock isGoreBlock;
+    private readonly IsStableBlock isStableBlock;
     private readonly IGroundFinder groundFinder;
 
     /// <summary>
     /// Creates a new zombie corpse positioner, backed by the given parameters.
     /// </summary>
     /// <param name="log">This will be used for debug logging.</param>
-    /// <param name="isGoreBlock">This will be used to check whether or not a certain location is already occupied with a corpse.</param>
+    /// <param name="isStableBlock">This will be used to check whether or not a certain location is occupied with a stable block.</param>
     /// <param name="groundFinder">This will be used to locate the 'ground level' for a certain starting position.</param>
     /// <param name="config">This will be used to limit the scope of the search, for performance reasons.</param>
     /// <exception cref="ArgumentNullException">If any of the parameters are null.</exception>
-    public ZombieCorpsePositioner(Logger log, IsGoreBlock isGoreBlock, IGroundFinder groundFinder, Configuration config)
+    public ZombieCorpsePositioner(Logger log, IsStableBlock isStableBlock, IGroundFinder groundFinder, Configuration config)
     {
-        this.log = log ?? throw new ArgumentNullException("log", "The given logger must not be null");
-        this.isGoreBlock = isGoreBlock ?? throw new ArgumentNullException("isGoreBlock", "The given gore block delegate must not be null");
-        this.groundFinder = groundFinder ?? throw new ArgumentNullException("groundFinder", "The given ground finder must not be null");
+        if (log == null)
+            throw new ArgumentNullException("log", "The given logger must not be null");
+        this.log = log;
+        if (isStableBlock == null)
+            throw new ArgumentNullException("isStableBlock", "The given block stability delegate must not be null");
+        this.isStableBlock = isStableBlock;
+        if (groundFinder == null)
+            throw new ArgumentNullException("groundFinder", "The given ground finder must not be null");
+        this.groundFinder = groundFinder;
         if (config == null)
             throw new ArgumentNullException("config", "The given configuration must not be null");
         MAX_SEARCH_RADIUS = config.MAX_SEARCH_RADIUS;
@@ -145,10 +154,8 @@ public class ZombieCorpsePositioner
             log("Unable to find ground position starting from: " + location);
             return Vector3i.zero;
         }
-        if (!isGoreBlock(location))
-        {
+        if (isStableBlock(location))
             return location;
-        }
         return Vector3i.zero;
     }
 }

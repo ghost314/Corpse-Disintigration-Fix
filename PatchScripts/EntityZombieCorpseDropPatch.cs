@@ -3,13 +3,44 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System.Linq;
 
+/// <summary>
+/// This is a patch script that modifies some code in the stock 7D2D dll files. See https://7d2dsdx.github.io/Tutorials/index.html for more info.
+/// </summary>
 public class EntityZombieCorpseDropPatch : IPatcherMod
 {
+    /// <summary>
+    /// This method is called to make alterations to the core game assembly before linking the game assembly with the mod assembly. This mod requires no changes here.
+    /// </summary>
+    /// <param name="module">The core module for 7D2D.</param>
+    /// <returns>True, always.</returns>
     public bool Patch(ModuleDefinition module)
     {
         return true;
     }
 
+    /// <summary>
+    /// This method is used to link the core 7D2D assembly with the compiled mod assembly. This is where the modifications are made to cause the core game to call the code for this mod.
+    /// <para>
+    /// The general strategy for making this mod work, is to have the code responsible for spawning a corpse block for a dead zombie, call this mod with its current position in the game world.
+    /// This mod will then calculate a reasonable spot to spawn the corpse block and return the result to the calling code that's managing the dead zombie. The calling code will then update the
+    /// position of the dead zombie, just before it calls the code to spawn the corpse block, the rest happens as normal.
+    /// </para>
+    /// <para>
+    /// The code changes are made to <code>EntityZombie</code> which is the base class for all zombie types in the game. After modifications it should look something like this:
+    /// </para>
+    /// <code>
+    /// <para>protected override Vector3i dropCorpseBlock()</para>
+    /// <para>{</para>
+    /// <para>...</para>
+    /// <para>this.position = ZombieCorpsePositionUpdater.GetUpdatedPosition(this.position);</para>
+	/// <para>Vector3i vector3i = base.dropCorpseBlock();</para>
+    /// <para>...</para>
+    /// <para>}</para>
+    /// </code>
+    /// </summary>
+    /// <param name="gameModule">The core game module for 7D2D.</param>
+    /// <param name="modModule">The module for this mod.</param>
+    /// <returns>True, if it manages to complete.</returns>
     public bool Link(ModuleDefinition gameModule, ModuleDefinition modModule)
     {
         SDX.Core.Logging.LogInfo("Linking corpse fix module...");
@@ -19,21 +50,17 @@ public class EntityZombieCorpseDropPatch : IPatcherMod
 
         ILProcessor processor = dropCorpseBlockMethod.Body.GetILProcessor();
 
+        /// There is some awkwardness here, because the call to this module's code, needs to be made in front of the first line after a closing conditional.
+        /// If new instructions are directly added before the existing line at this position, the new instructions will be skipped over by the conditional.
+        /// The strategy used here to compensate, is to record the existing instruction, and alter it to suit our needs, then re-add the existing instruction
+        /// after the new block of instructions we are inserting has been executed.
         Instruction copyOfExistingInstruction = OverwriteAndReAddInstruction(processor, callToBaseCorpseDropMethod.Previous, Instruction.Create(OpCodes.Ldarg_0));
 
         AddRemainingInstructionsBefore(processor, copyOfExistingInstruction, gameModule, modModule);
 
         return true;
     }
-
-    private void MakeBlockImplementIBlock(ModuleDefinition gameModule, ModuleDefinition modModule)
-    {
-        TypeDefinition blockClass = gameModule.Types.First(type => type.Name.Equals("Block"));
-        TypeDefinition iblockInterface = modModule.Types.First(type => type.Name.Equals("IBlock"));
-
-        blockClass.Interfaces.Add(iblockInterface);
-    }
-
+    
     private MethodDefinition GetCorpseDropMethodToAlter(ModuleDefinition gameModule)
     {
         TypeDefinition entityZombie = gameModule.Types.First(type => type.Name.Equals("EntityZombie"));

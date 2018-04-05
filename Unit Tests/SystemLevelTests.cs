@@ -17,7 +17,7 @@ public class SystemLevelTests
     {
         Configuration config = new Configuration(WORLD_HEIGHT, 0, SEARCH_RADIUS, CACHE_PERSISTANCE);
         fakeWorld = new FakeWorld(config);
-        positioner = new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).BlockTag == BlockTags.Gore, new GroundFinder(config, location => fakeWorld.GetBlockAt(location).IsCollideMovement, new GroundPositionCache(new CacheTimer(config.CACHE_PERSISTANCE, GetTick))), config);
+        positioner = new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).BlockTag != BlockTags.Gore, new GroundFinder(config, location => fakeWorld.GetBlockAt(location).IsCollideMovement, new GroundPositionCache(new CacheTimer(config.CACHE_PERSISTANCE, GetTick))), config);
     }
 
     private ulong GetTick()

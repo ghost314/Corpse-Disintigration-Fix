@@ -16,7 +16,9 @@ public class GroundPositionCache
     /// <exception cref="ArgumentNullException">If timer is null.</exception>
     public GroundPositionCache(ICacheTimer timer)
     {
-        this.timer = timer ?? throw new ArgumentNullException("timer", "The given timer must not be null");
+        if (timer == null)
+            throw new ArgumentNullException("timer", "The given timer must not be null");
+        this.timer = timer;
     }
 
     /// <summary>

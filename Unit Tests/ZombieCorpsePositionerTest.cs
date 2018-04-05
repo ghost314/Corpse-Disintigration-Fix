@@ -18,7 +18,7 @@ public class ZombieCorpsePositionerTest
         Configuration config = new Configuration(WORLD_HEIGHT, 0, SEARCH_RADIUS, CACHE_PERSISTANCE);
         fakeWorld = new FakeWorld(config);
         groundFinder = new FakeGroundFinder();
-        positioner = new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).BlockTag == BlockTags.Gore, groundFinder, config);
+        positioner = new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).BlockTag != BlockTags.Gore, groundFinder, config);
     }
 
     [SetUp]
