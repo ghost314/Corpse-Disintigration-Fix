@@ -11,14 +11,16 @@ public class ZombieCorpsePositionerTest
     private ZombieCorpsePositioner positioner;
     private FakeWorld fakeWorld;
     private FakeGroundFinder groundFinder;
+    private BlockValue corpseBlock;
 
     [OneTimeSetUp]
     public void Init()
     {
         Configuration config = new Configuration(WORLD_HEIGHT, 0, SEARCH_RADIUS, CACHE_PERSISTANCE);
+        corpseBlock = new BlockValue();
         fakeWorld = new FakeWorld(config);
         groundFinder = new FakeGroundFinder();
-        positioner = new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).BlockTag != BlockTags.Gore, groundFinder, config);
+        positioner = new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).IsStableBlock, (location, corpseBlock) => fakeWorld.GetBlockAt(location).IsValidSpawnPosition, groundFinder, config);
     }
 
     [SetUp]
@@ -45,7 +47,7 @@ public class ZombieCorpsePositionerTest
     {
         Vector3i startingPosition = new Vector3i(5, 0, 5);
 
-        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition);
+        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition, corpseBlock);
 
         Assert.AreEqual(new Vector3i(startingPosition.x, GROUND_HEIGHT + 1, startingPosition.z), position);
     }
@@ -56,9 +58,9 @@ public class ZombieCorpsePositionerTest
         int height = GROUND_HEIGHT + 1;
 
         Vector3i startingPosition = new Vector3i(5, height, 5);
-        fakeWorld.SetBlockAt(startingPosition, fakeWorld.GenerateGoreBlock());
+        fakeWorld.SetBlockAt(startingPosition, fakeWorld.GenerateOccupiedBlock(true, false));
 
-        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition);
+        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition, corpseBlock);
 
         int deltaX = Math.Abs(position.x - startingPosition.x);
         int deltaZ = Math.Abs(position.z - startingPosition.z);
@@ -88,9 +90,9 @@ public class ZombieCorpsePositionerTest
                 }
             }
         }
-        fakeWorld.SetBlockAt(startingPosition, fakeWorld.GenerateGoreBlock());
+        fakeWorld.SetBlockAt(startingPosition, fakeWorld.GenerateOccupiedBlock(true, false));
 
-        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition);
+        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition, corpseBlock);
 
         int deltaX = Math.Abs(position.x - startingPosition.x);
         int deltaZ = Math.Abs(position.z - startingPosition.z);
@@ -107,11 +109,11 @@ public class ZombieCorpsePositionerTest
 
         Vector3i startingPosition = new Vector3i(5, height, 5);
         fakeWorld.SetBlockAt(new Vector3i(startingPosition.x, startingPosition.y - 2, startingPosition.z), fakeWorld.GenerateEmptyBlock());
-        fakeWorld.SetBlockAt(new Vector3i(startingPosition.x, startingPosition.y - 3, startingPosition.z), fakeWorld.GenerateGoreBlock());
+        fakeWorld.SetBlockAt(new Vector3i(startingPosition.x, startingPosition.y - 3, startingPosition.z), fakeWorld.GenerateOccupiedBlock(true, false));
         fakeWorld.SetBlockAt(new Vector3i(startingPosition.x, startingPosition.y + 1, startingPosition.z), fakeWorld.GenerateOccupiedBlock());
-        fakeWorld.SetBlockAt(new Vector3i(startingPosition.x, startingPosition.y + 2, startingPosition.z), fakeWorld.GenerateGoreBlock());
+        fakeWorld.SetBlockAt(new Vector3i(startingPosition.x, startingPosition.y + 2, startingPosition.z), fakeWorld.GenerateOccupiedBlock(true, false));
 
-        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition);
+        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition, corpseBlock);
 
         Assert.AreEqual(new Vector3i(startingPosition.x, height, startingPosition.z), position);
     }
@@ -129,15 +131,15 @@ public class ZombieCorpsePositionerTest
                 if (x != startingPosition.x || z != startingPosition.z)
                 {
                     fakeWorld.SetBlockAt(new Vector3i(x, startingPosition.y - 2, z), fakeWorld.GenerateEmptyBlock());
-                    fakeWorld.SetBlockAt(new Vector3i(x, startingPosition.y - 3, z), fakeWorld.GenerateGoreBlock());
+                    fakeWorld.SetBlockAt(new Vector3i(x, startingPosition.y - 3, z), fakeWorld.GenerateOccupiedBlock(true, false));
                     fakeWorld.SetBlockAt(new Vector3i(x, startingPosition.y + 1, z), fakeWorld.GenerateOccupiedBlock());
-                    fakeWorld.SetBlockAt(new Vector3i(x, startingPosition.y + 2, z), fakeWorld.GenerateGoreBlock());
+                    fakeWorld.SetBlockAt(new Vector3i(x, startingPosition.y + 2, z), fakeWorld.GenerateOccupiedBlock(true, false));
                 }
             }
         }
-        fakeWorld.SetBlockAt(startingPosition, fakeWorld.GenerateGoreBlock());
+        fakeWorld.SetBlockAt(startingPosition, fakeWorld.GenerateOccupiedBlock(true, false));
 
-        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition);
+        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition, corpseBlock);
 
         int deltaX = Math.Abs(position.x - startingPosition.x);
         int deltaZ = Math.Abs(position.z - startingPosition.z);
@@ -154,9 +156,9 @@ public class ZombieCorpsePositionerTest
 
         Vector3i startingPosition = new Vector3i(5, height, 5);
         groundFinder.GroundPositions.Clear();
-        fakeWorld.SetBlockAt(startingPosition, fakeWorld.GenerateGoreBlock());
+        fakeWorld.SetBlockAt(startingPosition, fakeWorld.GenerateOccupiedBlock(true, false));
 
-        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition);
+        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition, corpseBlock);
 
         Assert.AreEqual(startingPosition, position);
     }
@@ -171,11 +173,11 @@ public class ZombieCorpsePositionerTest
         {
             for (int z = startingPosition.z - SEARCH_RADIUS; z <= startingPosition.z + SEARCH_RADIUS; z++)
             {
-                fakeWorld.SetBlockAt(new Vector3i(x, height, z), fakeWorld.GenerateGoreBlock());
+                fakeWorld.SetBlockAt(new Vector3i(x, height, z), fakeWorld.GenerateOccupiedBlock(true, false));
             }
         }
 
-        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition);
+        Vector3i position = positioner.FindSpawnLocationStartingFrom(startingPosition, corpseBlock);
 
         Assert.AreEqual(startingPosition, position);
     }
@@ -184,26 +186,33 @@ public class ZombieCorpsePositionerTest
     public void WhenLoggerIsNullThenExceptionIsThrown()
     {
         Configuration config = new Configuration(WORLD_HEIGHT, 0, SEARCH_RADIUS, CACHE_PERSISTANCE);
-        Assert.That(() => new ZombieCorpsePositioner(null, location => fakeWorld.GetBlockAt(location).BlockTag == BlockTags.Gore, groundFinder, config), Throws.ArgumentNullException);
+        Assert.That(() => new ZombieCorpsePositioner(null, location => fakeWorld.GetBlockAt(location).IsStableBlock, (location, corpseBlock) => fakeWorld.GetBlockAt(location).IsValidSpawnPosition, groundFinder, config), Throws.ArgumentNullException);
     }
 
     [Test]
-    public void WhenGoreBlockDelegateIsNullThenExceptionIsThrown()
+    public void WhenBlockStabilityDelegateIsNullThenExceptionIsThrown()
     {
         Configuration config = new Configuration(WORLD_HEIGHT, 0, SEARCH_RADIUS, CACHE_PERSISTANCE);
-        Assert.That(() => new ZombieCorpsePositioner(Console.WriteLine, null, groundFinder, config), Throws.ArgumentNullException);
+        Assert.That(() => new ZombieCorpsePositioner(Console.WriteLine, null, (location, corpseBlock) => fakeWorld.GetBlockAt(location).IsValidSpawnPosition, groundFinder, config), Throws.ArgumentNullException);
+    }
+
+    [Test]
+    public void WhenValidSpawnCheckDelegateIsNullThenExceptionIsThrown()
+    {
+        Configuration config = new Configuration(WORLD_HEIGHT, 0, SEARCH_RADIUS, CACHE_PERSISTANCE);
+        Assert.That(() => new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).IsStableBlock, null, groundFinder, config), Throws.ArgumentNullException);
     }
 
     [Test]
     public void WhenGroundFinderIsNullThenExceptionIsThrown()
     {
         Configuration config = new Configuration(WORLD_HEIGHT, 0, SEARCH_RADIUS, CACHE_PERSISTANCE);
-        Assert.That(() => new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).BlockTag == BlockTags.Gore, null, config), Throws.ArgumentNullException);
+        Assert.That(() => new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).IsStableBlock, (location, corpseBlock) => fakeWorld.GetBlockAt(location).IsValidSpawnPosition, null, config), Throws.ArgumentNullException);
     }
 
     [Test]
     public void WhenConfigIsNullThenExceptionIsThrown()
     {
-        Assert.That(() => new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).BlockTag == BlockTags.Gore, groundFinder, null), Throws.ArgumentNullException);
+        Assert.That(() => new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).IsStableBlock, (location, corpseBlock) => fakeWorld.GetBlockAt(location).IsValidSpawnPosition, groundFinder, null), Throws.ArgumentNullException);
     }
 }

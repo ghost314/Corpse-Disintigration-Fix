@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// This class serves as a bridge, between the 7D2D game engine, and the rest of this mod.
@@ -11,10 +12,24 @@ public static class ZombieCorpsePositionUpdater
     /// This method is called directly from the core 7D2D game engine, due to the patch script.
     /// </summary>
     /// <param name="position">This will be set to the current position of the zombie that needs to spawn a corpse.</param>
+    /// <param name="corpseBlock">This will be set to the corpse block that is about to be spawned.</param>
     /// <returns>The new position that the zombie corpse should spawn at.</returns>
-    public static Vector3 GetUpdatedPosition(Vector3 position)
+    public static Vector3 GetUpdatedPosition(Vector3 position, BlockValue corpseBlock)
     {
-        Vector3i newPosition = positioner.FindSpawnLocationStartingFrom(World.worldToBlockPos(position));
-        return new Vector3(newPosition.x, newPosition.y, newPosition.z);
+        try
+        {
+            Vector3i newPosition = positioner.FindSpawnLocationStartingFrom(World.worldToBlockPos(position), corpseBlock);
+            return new Vector3(newPosition.x, newPosition.y, newPosition.z);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("Corpse Disintigration Fix: Uncaught exception: " + e.Message + ", in: " + e.TargetSite);
+            Debug.Log("Corpse Disintigration Fix: Stack trace follows:");
+            Debug.Log(e.StackTrace);
+            if (Settings.Default.DEBUG_MODE)
+                throw e;
+        }
+
+        return position;
     }
 }

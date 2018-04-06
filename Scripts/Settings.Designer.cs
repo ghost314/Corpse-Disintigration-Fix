@@ -65,4 +65,26 @@ internal sealed partial class Settings : global::System.Configuration.Applicatio
             return ((uint)(this["CACHE_PERSISTANCE"]));
         }
     }
+
+    [global::System.Configuration.ApplicationScopedSettingAttribute()]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    [global::System.Configuration.DefaultSettingValueAttribute("False")]
+    public bool DEBUG_MODE
+    {
+        get
+        {
+            return ((bool)(this["DEBUG_MODE"]));
+        }
+    }
+
+    [global::System.Configuration.ApplicationScopedSettingAttribute()]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    [global::System.Configuration.DefaultSettingValueAttribute("False")]
+    public bool SPAWN_ON_SPIKES
+    {
+        get
+        {
+            return ((bool)(this["SPAWN_ON_SPIKES"]));
+        }
+    }
 }

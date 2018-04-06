@@ -9,13 +9,29 @@ using System.Linq;
 public class EntityZombieCorpseDropPatch : IPatcherMod
 {
     /// <summary>
-    /// This method is called to make alterations to the core game assembly before linking the game assembly with the mod assembly. This mod requires no changes here.
+    /// This method is called to make alterations to the core game assembly before linking the game assembly with the mod assembly.
+    /// <para>
+    /// This mod requires the corpse block field of EntityAlive to have at least protected level access.
+    /// </para>
     /// </summary>
     /// <param name="module">The core module for 7D2D.</param>
     /// <returns>True, always.</returns>
     public bool Patch(ModuleDefinition module)
     {
+        FieldDefinition corpseBlockField = GetCorpseBlockField(module);
+        SetFieldToProtected(corpseBlockField);
+
         return true;
+    }
+
+    private void SetFieldToProtected(FieldDefinition field)
+    {
+        if(!field.IsFamily && !field.IsPublic)
+        {
+            field.IsPrivate = false;
+            field.IsFamily = true;
+            field.IsPublic = false;
+        }
     }
 
     /// <summary>
@@ -60,7 +76,7 @@ public class EntityZombieCorpseDropPatch : IPatcherMod
 
         return true;
     }
-    
+
     private MethodDefinition GetCorpseDropMethodToAlter(ModuleDefinition gameModule)
     {
         TypeDefinition entityZombie = gameModule.Types.First(type => type.Name.Equals("EntityZombie"));
@@ -113,10 +129,19 @@ public class EntityZombieCorpseDropPatch : IPatcherMod
     {
         MethodReference getUpdatedPosition = ImportCorpsePositionUpdaterIntoGameModule(gameModule, modModule);
         FieldDefinition positionField = GetPositionField(gameModule);
+        FieldDefinition corpseBlockField = GetCorpseBlockField(gameModule);
 
         processor.InsertBefore(instruction, Instruction.Create(OpCodes.Ldarg_0));
         processor.InsertBefore(instruction, Instruction.Create(OpCodes.Ldfld, positionField));
+        processor.InsertBefore(instruction, Instruction.Create(OpCodes.Ldarg_0));
+        processor.InsertBefore(instruction, Instruction.Create(OpCodes.Ldfld, corpseBlockField));
         processor.InsertBefore(instruction, Instruction.Create(OpCodes.Call, getUpdatedPosition));
         processor.InsertBefore(instruction, Instruction.Create(OpCodes.Stfld, positionField));
+    }
+
+    private FieldDefinition GetCorpseBlockField(ModuleDefinition gameModule)
+    {
+        TypeDefinition entity = gameModule.Types.First(type => type.Name.Equals("EntityAlive"));
+        return entity.Fields.First(field => field.Name.Equals("XH"));
     }
 }

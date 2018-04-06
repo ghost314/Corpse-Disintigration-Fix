@@ -36,34 +36,33 @@
         fakeWorld[position.x, position.y, position.z] = block;
     }
 
-    public FakeBlock GenerateOccupiedBlock()
+    public FakeBlock GenerateOccupiedBlock(bool isStableBlock = true, bool isCollideMovement = true)
     {
-        return new FakeBlock(BlockTags.None, true);
+        return new FakeBlock(isStableBlock, isCollideMovement, false);
     }
 
-    public FakeBlock GenerateGoreBlock()
+    public FakeBlock GenerateEmptyBlock(bool isStableBlock = true)
     {
-        return new FakeBlock(BlockTags.Gore, false);
-    }
-
-    public FakeBlock GenerateEmptyBlock()
-    {
-        return new FakeBlock(BlockTags.None, false);
+        return new FakeBlock(isStableBlock, false, true);
     }
 
     public class FakeBlock
     {
-        private BlockTags tag;
+        private bool isStableBlock;
         private bool isCollideMovement;
+        private bool isValidSpawnPosition;
 
-        public FakeBlock(BlockTags tag, bool isCollideMovement)
+        public FakeBlock(bool isStableBlock, bool isCollideMovement, bool isValidSpawnPosition)
         {
-            this.tag = tag;
+            this.isStableBlock = isStableBlock;
             this.isCollideMovement = isCollideMovement;
+            this.isValidSpawnPosition = isValidSpawnPosition;
         }
 
-        public BlockTags BlockTag => tag;
+        public bool IsStableBlock => isStableBlock;
 
         public bool IsCollideMovement => isCollideMovement;
+
+        public bool IsValidSpawnPosition => isValidSpawnPosition;
     }
 }
