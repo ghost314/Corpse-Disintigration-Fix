@@ -10,7 +10,7 @@ public class CacheTimer : ICacheTimer
     /// </summary>
     /// <returns>The total time elapsed, ad a ulong.</returns>
     public delegate ulong Timer();
-    private readonly uint CACHE_PERSISTANCE;
+    private readonly uint cachePersistance;
     private readonly Timer timer;
     private ulong lastResetTime;
 
@@ -22,7 +22,7 @@ public class CacheTimer : ICacheTimer
     /// <exception cref="ArgumentNullException">If <paramref name="timer"/> is null.</exception>
     public CacheTimer(uint cachePersistance, Timer timer)
     {
-        CACHE_PERSISTANCE = cachePersistance;
+        this.cachePersistance = cachePersistance;
         if (timer == null)
             throw new ArgumentNullException("timer", "The given timer must not be null");
         this.timer = timer;
@@ -36,7 +36,7 @@ public class CacheTimer : ICacheTimer
     public bool IsCacheStillValid()
     {
         ulong time = timer();
-        if (time - lastResetTime < CACHE_PERSISTANCE)
+        if (time - lastResetTime < cachePersistance)
             return true;
         lastResetTime = time;
         return false;

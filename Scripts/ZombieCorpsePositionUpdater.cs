@@ -6,7 +6,8 @@ using UnityEngine;
 /// </summary>
 public static class ZombieCorpsePositionUpdater
 {
-    private static readonly ZombieCorpsePositioner positioner = ZombieCorpsePositionerFactory.GenerateNewPositioner();
+    private static readonly ZombieCorpsePositioner POSITIONER = ZombieCorpsePositionerFactory.GenerateNewPositioner();
+    private static readonly IConfiguration CONFIG = BlockCorpseDisintigrationFixConfig.GetLoadedInstance();
 
     /// <summary>
     /// This method is called directly from the core 7D2D game engine, due to the patch script.
@@ -18,7 +19,7 @@ public static class ZombieCorpsePositionUpdater
     {
         try
         {
-            Vector3i newPosition = positioner.FindSpawnLocationStartingFrom(World.worldToBlockPos(position), corpseBlock);
+            Vector3i newPosition = POSITIONER.FindSpawnLocationStartingFrom(World.worldToBlockPos(position), corpseBlock);
             return new Vector3(newPosition.x, newPosition.y, newPosition.z);
         }
         catch (Exception e)
@@ -26,7 +27,7 @@ public static class ZombieCorpsePositionUpdater
             Debug.Log("Corpse Disintigration Fix: Uncaught exception: " + e.Message + ", in: " + e.TargetSite);
             Debug.Log("Corpse Disintigration Fix: Stack trace follows:");
             Debug.Log(e.StackTrace);
-            if (Settings.Default.DEBUG_MODE)
+            if (CONFIG.DEBUG_MODE)
                 throw e;
         }
 

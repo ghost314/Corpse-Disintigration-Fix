@@ -2,7 +2,7 @@
 {
     private FakeBlock[,,] fakeWorld;
 
-    public FakeWorld(Configuration config)
+    public FakeWorld(IConfiguration config)
     {
         fakeWorld = new FakeBlock[(config.MAX_SEARCH_RADIUS * 2) + 1, config.MAX_HEIGHT, (config.MAX_SEARCH_RADIUS * 2) + 1];
     }

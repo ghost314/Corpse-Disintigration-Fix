@@ -8,14 +8,14 @@ public static class ZombieCorpsePositionerFactory
 {
     private const string DAMAGE_PROPERTY = "Damage";
 
+    private static readonly IConfiguration CONFIG = BlockCorpseDisintigrationFixConfig.GetLoadedInstance();
+
     /// <summary>
     /// Generates a new ZombieCorpsePositioner, that relies on real 7D2D code to perform its function.
     /// </summary>
     /// <returns>A new zombie corpse positioner.</returns>
     public static ZombieCorpsePositioner GenerateNewPositioner()
     {
-        Configuration CONFIG = new Configuration(Settings.Default.MAX_HEIGHT, Settings.Default.MIN_HEIGHT, Settings.Default.MAX_SEARCH_RADIUS, Settings.Default.CACHE_PERSISTANCE);
-
         GroundFinder.IsMovementRestrictingBlock isMovementRestrictingBlock = location => GetBlockAt(location).IsCollideMovement;
         ZombieCorpsePositioner.Logger log = msg => Debug.Log("Corpse Disintigration Fix: " + msg);
 
@@ -29,7 +29,7 @@ public static class ZombieCorpsePositionerFactory
     private static bool IsStableBlock(Vector3i location)
     {
         Block block = GetBlockAt(location);
-        return block.StabilitySupport && (Settings.Default.SPAWN_ON_SPIKES || !block.Properties.Values.ContainsKey(DAMAGE_PROPERTY));
+        return block.StabilitySupport && (CONFIG.SPAWN_ON_SPIKES || !block.Properties.Values.ContainsKey(DAMAGE_PROPERTY));
     }
 
     private static Block GetBlockAt(Vector3i location)

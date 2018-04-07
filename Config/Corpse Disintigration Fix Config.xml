@@ -1,0 +1,16 @@
+﻿<configs>
+  <config name="blocks">
+    <append xpath="/blocks">
+      <block id="" name="CorpseDisintigrationFixConfig">
+        <property name="Class" value="CorpseDisintigrationFixConfig, Mods"/>
+        <property name="Material" value="air" />
+        <property name="MAX_SEARCH_RADIUS" value="200"/>
+        <property name="MAX_HEIGHT" value="254"/>
+        <property name="MIN_HEIGHT" value="3"/>
+        <property name="CACHE_PERSISTANCE" value="1"/>
+        <property name="DEBUG_MODE" value="false"/>
+        <property name="SPAWN_ON_SPIKES" value="false"/>
+      </block>
+    </append>
+  </config>
+</configs>

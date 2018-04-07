@@ -11,9 +11,9 @@
 /// </summary>
 public class ZombieCorpsePositioner
 {
-    private readonly int MAX_SEARCH_RADIUS;
-    private readonly int MAX_HEIGHT;
-    private readonly int MIN_HEIGHT;
+    private readonly int maxSearchRadius;
+    private readonly int maxHeight;
+    private readonly int minHeight;
 
     /// <summary>
     /// A delegate method to use for debug logging.
@@ -50,7 +50,7 @@ public class ZombieCorpsePositioner
     /// <param name="groundFinder">This will be used to locate the 'ground level' for a certain starting position.</param>
     /// <param name="config">This will be used to limit the scope of the search, for performance reasons.</param>
     /// <exception cref="ArgumentNullException">If any of the parameters are null.</exception>
-    public ZombieCorpsePositioner(Logger log, IsStableBlock isStableBlock, IsValidSpawnPointForCorpseBlock isValidSpawnPointForCorpseBlock, IGroundFinder groundFinder, Configuration config)
+    public ZombieCorpsePositioner(Logger log, IsStableBlock isStableBlock, IsValidSpawnPointForCorpseBlock isValidSpawnPointForCorpseBlock, IGroundFinder groundFinder, IConfiguration config)
     {
         if (log == null)
             throw new ArgumentNullException("log", "The given logger must not be null");
@@ -66,9 +66,9 @@ public class ZombieCorpsePositioner
         this.groundFinder = groundFinder;
         if (config == null)
             throw new ArgumentNullException("config", "The given configuration must not be null");
-        MAX_SEARCH_RADIUS = config.MAX_SEARCH_RADIUS;
-        MAX_HEIGHT = config.MAX_HEIGHT;
-        MIN_HEIGHT = config.MIN_HEIGHT;
+        maxSearchRadius = config.MAX_SEARCH_RADIUS;
+        maxHeight = config.MAX_HEIGHT;
+        minHeight = config.MIN_HEIGHT;
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ public class ZombieCorpsePositioner
         if (potentialSpawnPoint != Vector3i.zero)
             return potentialSpawnPoint;
 
-        for (int distanceFromOrigin = 1; distanceFromOrigin < MAX_SEARCH_RADIUS; distanceFromOrigin++)
+        for (int distanceFromOrigin = 1; distanceFromOrigin < maxSearchRadius; distanceFromOrigin++)
         {
             Vector3i foundPosition = CheckTopRow(nextPositionToCheck, origin, corpseBlock, distanceFromOrigin);
             if (foundPosition != Vector3i.zero)
@@ -163,7 +163,7 @@ public class ZombieCorpsePositioner
     private Vector3i FindValidSpawnPointAt(Vector3i location, BlockValue corpseBlock)
     {
         location.y = groundFinder.FindPositionAboveGroundAt(location);
-        if (location.y < MIN_HEIGHT)
+        if (location.y < minHeight)
         {
             log("Unable to find ground position starting from: " + location);
             return Vector3i.zero;

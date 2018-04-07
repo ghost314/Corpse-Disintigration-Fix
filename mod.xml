@@ -8,6 +8,7 @@
 		<launcher_version>0.7.1</launcher_version>
 		<type>QoL</type>
 	</info>
-	<config_mods>
-	</config_mods>
+  <config_mods>
+    <import file="Config\Corpse Disintigration Fix Config.xml" />
+  </config_mods>
 </mod>

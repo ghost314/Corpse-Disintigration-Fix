@@ -16,8 +16,8 @@ public class GroundFinder : IGroundFinder
     /// <param name="location">The block location to check.</param>
     /// <returns>True if the block at the given location prevents movement, false otherwise.</returns>
     public delegate bool IsMovementRestrictingBlock(Vector3i location);
-    private readonly int MAX_HEIGHT;
-    private readonly int MIN_HEIGHT;
+    private readonly int maxHeight;
+    private readonly int minHeight;
     private readonly IsMovementRestrictingBlock isMovementRestrictingBlock;
     private readonly GroundPositionCache cache;
 
@@ -28,12 +28,12 @@ public class GroundFinder : IGroundFinder
     /// <param name="isMovementRestrictingBlock">The delegate to use, to check if a block allows free movement or not.</param>
     /// <param name="cache">The data cache, to use for improving performance.</param>
     /// <exception cref="ArgumentNullException">If any of the supplied parameters are null.</exception>
-    public GroundFinder(Configuration config, IsMovementRestrictingBlock isMovementRestrictingBlock, GroundPositionCache cache)
+    public GroundFinder(IConfiguration config, IsMovementRestrictingBlock isMovementRestrictingBlock, GroundPositionCache cache)
     {
         if (config == null)
             throw new ArgumentNullException("config", "The given configuration data must not be null");
-        MAX_HEIGHT = config.MAX_HEIGHT;
-        MIN_HEIGHT = config.MIN_HEIGHT;
+        maxHeight = config.MAX_HEIGHT;
+        minHeight = config.MIN_HEIGHT;
         if (isMovementRestrictingBlock == null)
             throw new ArgumentNullException("isMovementRestrictingBlock", "The given delegate function must not be null");
         this.isMovementRestrictingBlock = isMovementRestrictingBlock;
@@ -57,7 +57,7 @@ public class GroundFinder : IGroundFinder
         Vector3i airBlock = GetAirBlockForLocation(startingPoint);
         groundPosition = FindGroundBelow(airBlock);
 
-        if (groundPosition < MIN_HEIGHT)
+        if (groundPosition < minHeight)
         {
             cache.CacheGroundPositionForLocation(startingPoint, -1);
             return -1;
@@ -66,7 +66,7 @@ public class GroundFinder : IGroundFinder
         groundPosition++;
 
         if (airBlock.y < startingPoint.y)
-            startingPoint.y = MAX_HEIGHT;
+            startingPoint.y = maxHeight;
         cache.CacheGroundPositionForLocation(startingPoint, groundPosition);
 
         return groundPosition;
@@ -96,7 +96,7 @@ public class GroundFinder : IGroundFinder
     {
         location.y++;
 
-        for (; location.y < MAX_HEIGHT; location.y++)
+        for (; location.y < maxHeight; location.y++)
             if (!isMovementRestrictingBlock(location))
                 return location.y;
 
@@ -107,7 +107,7 @@ public class GroundFinder : IGroundFinder
     {
         location.y--;
 
-        for (; location.y >= MIN_HEIGHT; location.y--)
+        for (; location.y >= minHeight; location.y--)
             if (!isMovementRestrictingBlock(location))
                 return location.y;
 
@@ -118,7 +118,7 @@ public class GroundFinder : IGroundFinder
     {
         location.y--;
 
-        for (; location.y >= MIN_HEIGHT; location.y--)
+        for (; location.y >= minHeight; location.y--)
             if (isMovementRestrictingBlock(location))
                 return location.y;
 
