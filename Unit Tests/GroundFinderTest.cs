@@ -15,7 +15,7 @@ public class GroundFinderTest
     {
         fakeTimer = new FakeCacheTimer();
         fakeTimer.IsCacheValid = true;
-        IConfiguration config = new BlockCorpseDisintigrationFixConfig(5, WORLD_HEIGHT, 0, CACHE_PERSISTANCE);
+        IConfiguration config = new BlockCorpseDisintigrationFixConfig(5, WORLD_HEIGHT, 0, CACHE_PERSISTANCE, true, false);
         fakeWorld = new FakeWorld(config);
         groundFinder = new GroundFinder(config, location => fakeWorld.GetBlockAt(location).IsCollideMovement, new GroundPositionCache(fakeTimer));
     }
@@ -208,12 +208,12 @@ public class GroundFinderTest
     [Test]
     public void WhenDelegateIsNullThenExceptionIsThrown()
     {
-        Assert.That(() => new GroundFinder(new BlockCorpseDisintigrationFixConfig(5, WORLD_HEIGHT, 0, CACHE_PERSISTANCE), null, new GroundPositionCache(fakeTimer)), Throws.ArgumentNullException);
+        Assert.That(() => new GroundFinder(new BlockCorpseDisintigrationFixConfig(5, WORLD_HEIGHT, 0, CACHE_PERSISTANCE, true, false), null, new GroundPositionCache(fakeTimer)), Throws.ArgumentNullException);
     }
 
     [Test]
     public void WhenCacheIsNullThenExceptionIsThrown()
     {
-        Assert.That(() => new GroundFinder(new BlockCorpseDisintigrationFixConfig(5, WORLD_HEIGHT, 0, CACHE_PERSISTANCE), location => fakeWorld.GetBlockAt(location).IsCollideMovement, null), Throws.ArgumentNullException);
+        Assert.That(() => new GroundFinder(new BlockCorpseDisintigrationFixConfig(5, WORLD_HEIGHT, 0, CACHE_PERSISTANCE, true, false), location => fakeWorld.GetBlockAt(location).IsCollideMovement, null), Throws.ArgumentNullException);
     }
 }

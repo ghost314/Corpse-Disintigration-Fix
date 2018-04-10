@@ -16,7 +16,7 @@ public class ZombieCorpsePositionerTest
     [OneTimeSetUp]
     public void Init()
     {
-        IConfiguration config = new BlockCorpseDisintigrationFixConfig(SEARCH_RADIUS, WORLD_HEIGHT, 0, CACHE_PERSISTANCE);
+        IConfiguration config = new BlockCorpseDisintigrationFixConfig(SEARCH_RADIUS, WORLD_HEIGHT, 0, CACHE_PERSISTANCE, true, false);
         corpseBlock = new BlockValue();
         fakeWorld = new FakeWorld(config);
         groundFinder = new FakeGroundFinder();
@@ -185,28 +185,28 @@ public class ZombieCorpsePositionerTest
     [Test]
     public void WhenLoggerIsNullThenExceptionIsThrown()
     {
-        IConfiguration config = new BlockCorpseDisintigrationFixConfig(SEARCH_RADIUS, WORLD_HEIGHT, 0, CACHE_PERSISTANCE);
+        IConfiguration config = new BlockCorpseDisintigrationFixConfig(SEARCH_RADIUS, WORLD_HEIGHT, 0, CACHE_PERSISTANCE, true, false);
         Assert.That(() => new ZombieCorpsePositioner(null, location => fakeWorld.GetBlockAt(location).IsStableBlock, (location, corpseBlock) => fakeWorld.GetBlockAt(location).IsValidSpawnPosition, groundFinder, config), Throws.ArgumentNullException);
     }
 
     [Test]
     public void WhenBlockStabilityDelegateIsNullThenExceptionIsThrown()
     {
-        IConfiguration config = new BlockCorpseDisintigrationFixConfig(SEARCH_RADIUS, WORLD_HEIGHT, 0, CACHE_PERSISTANCE);
+        IConfiguration config = new BlockCorpseDisintigrationFixConfig(SEARCH_RADIUS, WORLD_HEIGHT, 0, CACHE_PERSISTANCE, true, false);
         Assert.That(() => new ZombieCorpsePositioner(Console.WriteLine, null, (location, corpseBlock) => fakeWorld.GetBlockAt(location).IsValidSpawnPosition, groundFinder, config), Throws.ArgumentNullException);
     }
 
     [Test]
     public void WhenValidSpawnCheckDelegateIsNullThenExceptionIsThrown()
     {
-        IConfiguration config = new BlockCorpseDisintigrationFixConfig(SEARCH_RADIUS, WORLD_HEIGHT, 0, CACHE_PERSISTANCE);
+        IConfiguration config = new BlockCorpseDisintigrationFixConfig(SEARCH_RADIUS, WORLD_HEIGHT, 0, CACHE_PERSISTANCE, true, false);
         Assert.That(() => new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).IsStableBlock, null, groundFinder, config), Throws.ArgumentNullException);
     }
 
     [Test]
     public void WhenGroundFinderIsNullThenExceptionIsThrown()
     {
-        IConfiguration config = new BlockCorpseDisintigrationFixConfig(SEARCH_RADIUS, WORLD_HEIGHT, 0, CACHE_PERSISTANCE);
+        IConfiguration config = new BlockCorpseDisintigrationFixConfig(SEARCH_RADIUS, WORLD_HEIGHT, 0, CACHE_PERSISTANCE, true, false);
         Assert.That(() => new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).IsStableBlock, (location, corpseBlock) => fakeWorld.GetBlockAt(location).IsValidSpawnPosition, null, config), Throws.ArgumentNullException);
     }
 

@@ -16,7 +16,7 @@ public class SystemLevelTests
     [OneTimeSetUp]
     public void Init()
     {
-        IConfiguration config = new BlockCorpseDisintigrationFixConfig(SEARCH_RADIUS, WORLD_HEIGHT, 0, CACHE_PERSISTANCE);
+        IConfiguration config = new BlockCorpseDisintigrationFixConfig(SEARCH_RADIUS, WORLD_HEIGHT, 0, CACHE_PERSISTANCE, true, false);
         corpseBlock = new BlockValue();
         fakeWorld = new FakeWorld(config);
         positioner = new ZombieCorpsePositioner(Console.WriteLine, location => fakeWorld.GetBlockAt(location).IsStableBlock, (location, corpseBlock) => fakeWorld.GetBlockAt(location).IsValidSpawnPosition, new GroundFinder(config, location => fakeWorld.GetBlockAt(location).IsCollideMovement, new GroundPositionCache(new CacheTimer(config.CACHE_PERSISTANCE, GetTick))), config);
